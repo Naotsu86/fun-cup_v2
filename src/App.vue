@@ -1,5 +1,10 @@
 <template>
-  <AppHeader v-model="tab" :status-text="statusText" @refresh="loadData" />
+  <AppHeader
+    v-model="tab"
+    :status-text="statusText"
+    :is-admin="isAdmin"
+    @refresh="loadData"
+  />
 
   <main class="wrap main-content">
     <p v-if="error" class="error-box">{{ error }}</p>
@@ -26,12 +31,13 @@
     />
 
     <Profile
-      v-if="tab === 'profile'"
+      v-if="tab === 'account' && !isAdmin"
+      @auth-changed="handleAuthChanged"
     />
 
     <Admin
-      v-if="tab === 'admin'"
-      :admin-unlocked="adminUnlocked"
+      v-if="tab === 'account' && isAdmin"
+      :admin-unlocked="isAdmin"
       :user-email="userEmail"
       :players="players"
       :matches="matches"
@@ -80,6 +86,7 @@ import {
 
 const tab = ref('overview')
 const session = ref(null)
+const isAdmin = ref(false)
 const players = ref([])
 const matches = ref([])
 const settings = ref({})
@@ -90,7 +97,6 @@ const message = ref('')
 let channel = null
 let timer = null
 
-const adminUnlocked = computed(() => !!session.value)
 const userEmail = computed(() => session.value?.user?.email || '')
 const ranking = computed(() => buildRanking(players.value, matches.value))
 const openMatches = computed(() => getOpenMatches(matches.value))
@@ -99,13 +105,15 @@ const statusText = computed(() => loading.value ? 'lädt...' : 'live')
 
 onMounted(async () => {
   await loadSession()
+  await checkAdmin()
   await loadData()
   subscribe()
 
   timer = setInterval(loadData, 5000)
 
-  supabase.auth.onAuthStateChange((_event, newSession) => {
+  supabase.auth.onAuthStateChange(async (_event, newSession) => {
     session.value = newSession
+    await checkAdmin()
   })
 })
 
@@ -127,6 +135,32 @@ async function loadSession() {
   await run(async () => {
     session.value = await getSession()
   })
+}
+
+async function checkAdmin() {
+  if (!session.value?.user) {
+    isAdmin.value = false
+    return
+  }
+
+  try {
+    const { data, error: adminError } = await supabase.rpc('is_admin')
+
+    if (adminError) {
+      isAdmin.value = false
+      return
+    }
+
+    isAdmin.value = !!data
+  } catch {
+    isAdmin.value = false
+  }
+}
+
+async function handleAuthChanged() {
+  await loadSession()
+  await checkAdmin()
+  await loadData()
 }
 
 async function loadData() {
@@ -156,6 +190,7 @@ function subscribe() {
 async function handleLogin({ email, password }) {
   await run(async () => {
     session.value = await loginWithPassword(email, password)
+    await checkAdmin()
     await loadData()
   })
 }
@@ -164,6 +199,7 @@ async function handleLogout() {
   await run(async () => {
     await logout()
     session.value = null
+    isAdmin.value = false
     tab.value = 'overview'
   })
 }

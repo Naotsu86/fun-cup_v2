@@ -54,6 +54,8 @@ import PlayerLoginPanel from '../components/auth/PlayerLoginPanel.vue'
 import { getCurrentUser, signOut } from '../services/authV2'
 import { getMyProfile } from '../services/playerProfileService'
 
+const emit = defineEmits(['auth-changed'])
+
 const user = ref(null)
 const profile = ref(null)
 const loadingProfile = ref(false)
@@ -71,6 +73,7 @@ async function loadProfile() {
 
     loadingProfile.value = true
     profile.value = await getMyProfile()
+    emit('auth-changed')
   } catch (error) {
     message.value = error.message || 'Profil konnte nicht geladen werden.'
   } finally {
@@ -83,5 +86,6 @@ async function logoutUser() {
   user.value = null
   profile.value = null
   message.value = 'Abgemeldet.'
+  emit('auth-changed')
 }
 </script>

@@ -29,20 +29,25 @@
       <span>Rangliste</span>
     </button>
 
-    <button class="pixel-tab" :class="{ active: modelValue === 'profile' }" @click="$emit('update:modelValue','profile')">
-      <img class="nav-icon-img" :src="icons.profile" alt="" />
-      <span>Profil</span>
-    </button>
-
-    <button class="pixel-tab" :class="{ active: modelValue === 'admin' }" @click="$emit('update:modelValue','admin')">
-      <img class="nav-icon-img" :src="icons.admin" alt="" />
-      <span>Admin</span>
+    <button class="pixel-tab" :class="{ active: modelValue === 'account' }" @click="$emit('update:modelValue','account')">
+      <img class="nav-icon-img" :src="accountIcon" alt="" />
+      <span>{{ isAdmin ? 'Admin' : 'Profil' }}</span>
     </button>
   </nav>
 </template>
 
 <script setup>
-defineProps({ modelValue: String, statusText: String })
+import { computed } from 'vue'
+
+const props = defineProps({
+  modelValue: String,
+  statusText: String,
+  isAdmin: {
+    type: Boolean,
+    default: false
+  }
+})
+
 defineEmits(['update:modelValue','refresh'])
 
 const base = import.meta.env.BASE_URL
@@ -54,7 +59,8 @@ const icons = {
   home: `${base}nav-icons/home.png`,
   games: `${base}nav-icons/games.png`,
   ranking: `${base}nav-icons/ranking.png`,
-  profile: `${base}icons/admin-key.png`,
-  admin: `${base}icons/admin-key.png`,
+  account: `${base}icons/admin-key.png`,
 }
+
+const accountIcon = computed(() => props.isAdmin ? `${base}icons/admin-key.png` : `${base}icons/admin-key.png`)
 </script>
