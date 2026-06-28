@@ -16,7 +16,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { avatarOptions, getOptionFile } from '../../services/avatarOptions'
+import { getOptionFile } from '../../services/avatarOptions'
 
 const props = defineProps({
   avatar: {
@@ -33,7 +33,7 @@ const baseAvatar = computed(() => {
 })
 
 const bellyAvatar = computed(() => {
-  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || 'penguin_belly_01_white.png'
+  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || 'belly_white.png'
   return `${base}avatar/belly/${file}`
 })
 
@@ -42,9 +42,9 @@ const shortsSrc = computed(() => layerSrc('shortsItem', 'shorts', props.avatar.s
 const accessorySrc = computed(() => layerSrc('accessoryItem', 'accessory', props.avatar.accessory_item))
 
 function layerSrc(optionGroup, folder, id) {
-  const option = avatarOptions[optionGroup]?.find(item => item.id === id)
-  if (!option || option.id === 'none') return ''
-  return `${base}avatar/${folder}/${option.file}`
+  const file = getOptionFile(optionGroup, id || 'none')
+  if (!file || id === 'none') return ''
+  return `${base}avatar/${folder}/${file}`
 }
 </script>
 
