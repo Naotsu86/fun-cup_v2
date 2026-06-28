@@ -21,12 +21,13 @@ export async function updateMyAvatar(profileId, avatar) {
   const { data, error } = await supabase
     .from('player_profiles')
     .update({
-      avatar_body: avatar.avatar_body,
-      avatar_belly: avatar.avatar_belly,
+      body_color: avatar.body_color,
+      belly_color: avatar.belly_color,
+      avatar_body: avatar.body_color,
+      avatar_belly: avatar.belly_color,
       head_item: avatar.head_item,
-      face_item: avatar.face_item,
-      body_item: avatar.body_item,
-      back_item: avatar.back_item,
+      shorts_item: avatar.shorts_item,
+      accessory_item: avatar.accessory_item,
       bio: avatar.bio ?? null
     })
     .eq('id', profileId)

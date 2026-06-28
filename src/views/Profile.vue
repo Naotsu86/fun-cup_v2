@@ -28,23 +28,20 @@
             <span v-else>Wartet auf Admin-Freigabe</span>
           </p>
 
-          <p><strong>Vorname:</strong><br>{{ profile.players?.name || profile.display_name }}</p>
-          <p><strong>AKA-Name:</strong><br>{{ profile.players?.aka_name || '-' }}</p>
+          <AvatarEditor
+            v-if="profile.players?.approved"
+            :profile="profile"
+            :saving="saving"
+            :message="saveMessage"
+            :error="saveError"
+            @save="saveAvatar"
+          />
 
-          <div class="profile-preview">
-            <div class="penguin-placeholder">🐧</div>
-            <div>
-              <p><strong>Avatar</strong></p>
-              <p class="muted">
-                Körper: {{ profile.avatar_body }}<br>
-                Bauch: {{ profile.avatar_belly }}
-              </p>
-            </div>
-          </div>
-
-          <button class="btn primary full" :disabled="!profile.players?.approved">
-            {{ profile.players?.approved ? 'Avatar bearbeiten kommt als Nächstes' : 'Avatar erst nach Freigabe möglich' }}
-          </button>
+          <template v-else>
+            <p><strong>Vorname:</strong><br>{{ profile.players?.name || profile.display_name }}</p>
+            <p><strong>AKA-Name:</strong><br>{{ profile.players?.aka_name || '-' }}</p>
+            <p class="muted">Avatarbearbeitung ist erst nach Admin-Freigabe möglich.</p>
+          </template>
         </template>
 
         <template v-else>
@@ -75,8 +72,9 @@
 import { onMounted, ref } from 'vue'
 import PlayerLoginPanel from '../components/auth/PlayerLoginPanel.vue'
 import PlayerRegisterPanel from '../components/auth/PlayerRegisterPanel.vue'
+import AvatarEditor from '../components/avatar/AvatarEditor.vue'
 import { getCurrentUser, signOut } from '../services/authV2'
-import { getMyProfile } from '../services/playerProfileService'
+import { getMyProfile, updateMyAvatar } from '../services/playerProfileService'
 
 const emit = defineEmits(['auth-changed'])
 
@@ -85,6 +83,9 @@ const user = ref(null)
 const profile = ref(null)
 const loadingProfile = ref(false)
 const message = ref('')
+const saving = ref(false)
+const saveMessage = ref('')
+const saveError = ref('')
 
 onMounted(loadProfile)
 
@@ -103,6 +104,24 @@ async function loadProfile() {
     message.value = error.message || 'Profil konnte nicht geladen werden.'
   } finally {
     loadingProfile.value = false
+  }
+}
+
+async function saveAvatar(avatar) {
+  if (!profile.value) return
+
+  saving.value = true
+  saveMessage.value = ''
+  saveError.value = ''
+
+  try {
+    profile.value = await updateMyAvatar(profile.value.id, avatar)
+    await loadProfile()
+    saveMessage.value = 'Avatar gespeichert.'
+  } catch (e) {
+    saveError.value = e.message || 'Avatar konnte nicht gespeichert werden.'
+  } finally {
+    saving.value = false
   }
 }
 
