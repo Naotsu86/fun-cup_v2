@@ -1,35 +1,10 @@
 export const avatarOptions = {
   bodyColor: [
-    { id: 'penguin_reference_full_256', label: 'Penguin Reference Full 256', file: 'penguin_penguin_reference_full_256.png' }
+    { id: 'black', label: 'Schwarz', file: 'penguin_black.png', swatch: '#252525' }
   ],
 
   bellyColor: [
-    { id: 'black', label: 'Schwarz', file: 'belly_black.png', swatch: '#252525' },
-    { id: 'blue', label: 'Blau', file: 'belly_blue.png', swatch: '#2563eb' },
-    { id: 'navy', label: 'Navy', file: 'belly_navy.png', swatch: '#1e3a8a' },
-    { id: 'teal', label: 'Türkis', file: 'belly_teal.png', swatch: '#0f766e' },
-    { id: 'green', label: 'Grün', file: 'belly_green.png', swatch: '#16a34a' },
-    { id: 'lime', label: 'Lime', file: 'belly_lime.png', swatch: '#84cc16' },
-    { id: 'yellow', label: 'Gelb', file: 'belly_yellow.png', swatch: '#eab308' },
-    { id: 'orange', label: 'Orange', file: 'belly_orange.png', swatch: '#f97316' },
-    { id: 'red', label: 'Rot', file: 'belly_red.png', swatch: '#dc2626' },
-    { id: 'pink', label: 'Pink', file: 'belly_pink.png', swatch: '#ec4899' },
-    { id: 'purple', label: 'Lila', file: 'belly_purple.png', swatch: '#7c3aed' },
-    { id: 'brown', label: 'Braun', file: 'belly_brown.png', swatch: '#92400e' },
-    { id: 'gray', label: 'Grau', file: 'belly_gray.png', swatch: '#6b7280' },
-    { id: 'black_2', label: 'Schwarz', file: 'belly_black_2.png', swatch: '#252525' },
-    { id: 'blue_2', label: 'Blau', file: 'belly_blue_2.png', swatch: '#2563eb' },
-    { id: 'navy_2', label: 'Navy', file: 'belly_navy_2.png', swatch: '#1e3a8a' },
-    { id: 'teal_2', label: 'Türkis', file: 'belly_teal_2.png', swatch: '#0f766e' },
-    { id: 'green_2', label: 'Grün', file: 'belly_green_2.png', swatch: '#16a34a' },
-    { id: 'lime_2', label: 'Lime', file: 'belly_lime_2.png', swatch: '#84cc16' },
-    { id: 'yellow_2', label: 'Gelb', file: 'belly_yellow_2.png', swatch: '#eab308' },
-    { id: 'orange_2', label: 'Orange', file: 'belly_orange_2.png', swatch: '#f97316' },
-    { id: 'red_2', label: 'Rot', file: 'belly_red_2.png', swatch: '#dc2626' },
-    { id: 'pink_2', label: 'Pink', file: 'belly_pink_2.png', swatch: '#ec4899' },
-    { id: 'purple_2', label: 'Lila', file: 'belly_purple_2.png', swatch: '#7c3aed' },
-    { id: 'brown_2', label: 'Braun', file: 'belly_brown_2.png', swatch: '#92400e' },
-    { id: 'gray_2', label: 'Grau', file: 'belly_gray_2.png', swatch: '#6b7280' }
+    { id: 'white', label: 'Weiß', file: 'penguin_belly_01_white.png', swatch: '#fffaf0' }
   ],
 
   headItem: [
@@ -63,20 +38,7 @@ export const avatarOptions = {
     { id: 'pink', label: 'Pink Shorts', file: 'shorts_pink.png', swatch: '#ec4899', unlocked: true },
     { id: 'purple', label: 'Lila Shorts', file: 'shorts_purple.png', swatch: '#7c3aed', unlocked: true },
     { id: 'brown', label: 'Braun Shorts', file: 'shorts_brown.png', swatch: '#92400e', unlocked: true },
-    { id: 'gray', label: 'Grau Shorts', file: 'shorts_gray.png', swatch: '#6b7280', unlocked: true },
-    { id: 'skirt_black', label: 'Schwarz Rock', file: 'skirt_skirt_black.png', swatch: '#252525', unlocked: true },
-    { id: 'skirt_blue', label: 'Blau Rock', file: 'skirt_skirt_blue.png', swatch: '#2563eb', unlocked: true },
-    { id: 'skirt_navy', label: 'Navy Rock', file: 'skirt_skirt_navy.png', swatch: '#1e3a8a', unlocked: true },
-    { id: 'skirt_teal', label: 'Türkis Rock', file: 'skirt_skirt_teal.png', swatch: '#0f766e', unlocked: true },
-    { id: 'skirt_green', label: 'Grün Rock', file: 'skirt_skirt_green.png', swatch: '#16a34a', unlocked: true },
-    { id: 'skirt_lime', label: 'Lime Rock', file: 'skirt_skirt_lime.png', swatch: '#84cc16', unlocked: true },
-    { id: 'skirt_yellow', label: 'Gelb Rock', file: 'skirt_skirt_yellow.png', swatch: '#eab308', unlocked: true },
-    { id: 'skirt_orange', label: 'Orange Rock', file: 'skirt_skirt_orange.png', swatch: '#f97316', unlocked: true },
-    { id: 'skirt_red', label: 'Rot Rock', file: 'skirt_skirt_red.png', swatch: '#dc2626', unlocked: true },
-    { id: 'skirt_pink', label: 'Pink Rock', file: 'skirt_skirt_pink.png', swatch: '#ec4899', unlocked: true },
-    { id: 'skirt_purple', label: 'Lila Rock', file: 'skirt_skirt_purple.png', swatch: '#7c3aed', unlocked: true },
-    { id: 'skirt_brown', label: 'Braun Rock', file: 'skirt_skirt_brown.png', swatch: '#92400e', unlocked: true },
-    { id: 'skirt_gray', label: 'Grau Rock', file: 'skirt_skirt_gray.png', swatch: '#6b7280', unlocked: true }
+    { id: 'gray', label: 'Grau Shorts', file: 'shorts_gray.png', swatch: '#6b7280', unlocked: true }
   ],
 
   accessoryItem: [
