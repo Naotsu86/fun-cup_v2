@@ -9,7 +9,7 @@ export async function getMyProfile() {
 
   const { data, error } = await supabase
     .from('player_profiles')
-    .select('*, players(name)')
+    .select('*, players(name, aka_name, email, approved, active)')
     .eq('user_id', user.id)
     .maybeSingle()
 

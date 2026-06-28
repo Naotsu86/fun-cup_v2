@@ -1,6 +1,15 @@
 <template>
   <section class="screen">
-    <PlayerLoginPanel v-if="!user" @logged-in="loadProfile" />
+    <PlayerRegisterPanel
+      v-if="mode === 'register' && !user"
+      @show-login="mode = 'login'"
+      @registered="mode = 'login'"
+    />
+
+    <PlayerLoginPanel
+      v-else-if="!user"
+      @logged-in="loadProfile"
+    />
 
     <div v-else class="card pixel-card menu-window">
       <h2>👤 Mein Profil</h2>
@@ -13,8 +22,14 @@
         </template>
 
         <template v-else-if="profile">
-          <p><strong>Status:</strong><br>Spieler</p>
-          <p><strong>Spielername:</strong><br>{{ profile.display_name || profile.players?.name || 'Noch nicht gesetzt' }}</p>
+          <p>
+            <strong>Status:</strong><br>
+            <span v-if="profile.players?.approved">Freigegeben</span>
+            <span v-else>Wartet auf Admin-Freigabe</span>
+          </p>
+
+          <p><strong>Vorname:</strong><br>{{ profile.players?.name || profile.display_name }}</p>
+          <p><strong>AKA-Name:</strong><br>{{ profile.players?.aka_name || '-' }}</p>
 
           <div class="profile-preview">
             <div class="penguin-placeholder">🐧</div>
@@ -27,8 +42,8 @@
             </div>
           </div>
 
-          <button class="btn primary full" disabled>
-            Avatar bearbeiten kommt als Nächstes
+          <button class="btn primary full" :disabled="!profile.players?.approved">
+            {{ profile.players?.approved ? 'Avatar bearbeiten kommt als Nächstes' : 'Avatar erst nach Freigabe möglich' }}
           </button>
         </template>
 
@@ -45,17 +60,27 @@
         <p v-if="message" class="muted">{{ message }}</p>
       </div>
     </div>
+
+    <div v-if="!user && mode === 'login'" class="card pixel-card menu-window">
+      <div class="menu-body">
+        <button class="btn full" @click="mode = 'register'">
+          Noch kein Konto? Registrieren
+        </button>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import PlayerLoginPanel from '../components/auth/PlayerLoginPanel.vue'
+import PlayerRegisterPanel from '../components/auth/PlayerRegisterPanel.vue'
 import { getCurrentUser, signOut } from '../services/authV2'
 import { getMyProfile } from '../services/playerProfileService'
 
 const emit = defineEmits(['auth-changed'])
 
+const mode = ref('login')
 const user = ref(null)
 const profile = ref(null)
 const loadingProfile = ref(false)
