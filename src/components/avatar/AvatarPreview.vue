@@ -5,12 +5,11 @@
       <div class="avatar-cloud cloud-a"></div>
       <div class="avatar-cloud cloud-b"></div>
 
-      <img class="avatar-layer" :src="baseAvatar" alt="Avatar" />
-      <img v-if="bellyAvatar" class="avatar-layer" :src="bellyAvatar" alt="" />
-
-      <img v-if="headSrc" class="avatar-layer" :src="headSrc" alt="" />
-      <img v-if="shortsSrc" class="avatar-layer" :src="shortsSrc" alt="" />
-      <img v-if="accessorySrc" class="avatar-layer" :src="accessorySrc" alt="" />
+      <img class="avatar-layer layer-body" :src="baseAvatar" alt="Avatar" />
+      <img v-if="bellyAvatar" class="avatar-layer layer-belly" :src="bellyAvatar" alt="" />
+      <img v-if="shortsSrc" class="avatar-layer layer-shorts" :src="shortsSrc" alt="" />
+      <img v-if="headSrc" class="avatar-layer layer-head" :src="headSrc" alt="" />
+      <img v-if="accessorySrc" class="avatar-layer layer-accessory" :src="accessorySrc" alt="" />
     </div>
   </div>
 </template>
@@ -29,12 +28,14 @@ const props = defineProps({
 const base = import.meta.env.BASE_URL
 
 const baseAvatar = computed(() => {
-  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || avatarOptions.bodyColor?.[0]?.file
+  const first = avatarOptions.bodyColor?.[0]?.file || ''
+  const file = getOptionFile('bodyColor', props.avatar.body_color || avatarOptions.bodyColor?.[0]?.id) || first
   return `${base}avatar/base/${file}`
 })
 
 const bellyAvatar = computed(() => {
-  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || avatarOptions.bellyColor?.[0]?.file
+  const first = avatarOptions.bellyColor?.[0]?.file || ''
+  const file = getOptionFile('bellyColor', props.avatar.belly_color || avatarOptions.bellyColor?.[0]?.id) || first
   return file ? `${base}avatar/belly/${file}` : ''
 })
 
@@ -51,9 +52,31 @@ function layerSrc(optionGroup, folder, id) {
 
 <style scoped>
 .avatar-preview-wrap{width:100%;display:grid;place-items:center}
-.avatar-stage{position:relative;width:230px;height:230px;overflow:hidden;border:3px solid #2b2115;background:linear-gradient(#7bd3ff 0 42%,#2f9bd1 42% 47%,#f8d98a 47% 68%,#e7b861 68%);box-shadow:4px 4px 0 rgba(0,0,0,.22)}
-.avatar-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;user-select:none;pointer-events:none}
-.avatar-sun{position:absolute;right:20px;top:16px;width:22px;height:22px;background:#ffd65a;border:3px solid #b97819;border-radius:50%}
-.avatar-cloud{position:absolute;height:10px;background:#fff;border-radius:8px;opacity:.8}
+.avatar-stage{
+  position:relative;
+  width:230px;
+  height:230px;
+  overflow:hidden;
+  border:3px solid #2b2115;
+  background:linear-gradient(#7bd3ff 0 42%,#2f9bd1 42% 47%,#f8d98a 47% 68%,#e7b861 68%);
+  box-shadow:4px 4px 0 rgba(0,0,0,.22);
+}
+.avatar-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  image-rendering:pixelated;
+  user-select:none;
+  pointer-events:none;
+}
+.layer-body{z-index:1}
+.layer-belly{z-index:2}
+.layer-shorts{z-index:3}
+.layer-head{z-index:4}
+.layer-accessory{z-index:5}
+.avatar-sun{position:absolute;right:20px;top:16px;width:22px;height:22px;background:#ffd65a;border:3px solid #b97819;border-radius:50%;z-index:0}
+.avatar-cloud{position:absolute;height:10px;background:#fff;border-radius:8px;opacity:.8;z-index:0}
 .cloud-a{left:22px;top:30px;width:46px}.cloud-b{left:92px;top:20px;width:34px}
 </style>

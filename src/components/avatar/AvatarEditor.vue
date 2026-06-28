@@ -70,41 +70,29 @@ import AvatarItemGrid from './AvatarItemGrid.vue'
 import { avatarOptions, getNextOption, getOptionLabel } from '../../services/avatarOptions'
 
 const props = defineProps({
-  profile: {
-    type: Object,
-    required: true
-  },
-  saving: {
-    type: Boolean,
-    default: false
-  },
-  message: {
-    type: String,
-    default: ''
-  },
-  error: {
-    type: String,
-    default: ''
-  }
+  profile: { type: Object, required: true },
+  saving: { type: Boolean, default: false },
+  message: { type: String, default: '' },
+  error: { type: String, default: '' }
 })
 
 const emit = defineEmits(['save'])
-
 const draft = reactive(makeDraft(props.profile))
 
-watch(
-  () => props.profile,
-  profile => Object.assign(draft, makeDraft(profile))
-)
+watch(() => props.profile, profile => Object.assign(draft, makeDraft(profile)))
 
 const playerName = computed(() => props.profile.players?.name || props.profile.display_name || '')
 const akaName = computed(() => props.profile.players?.aka_name || '')
 const unlockedItems = computed(() => props.profile.unlocked_items || [])
 
+function firstId(group, fallback) {
+  return avatarOptions[group]?.[0]?.id || fallback
+}
+
 function makeDraft(profile) {
   return {
-    body_color: profile.body_color || profile.avatar_body || 'black',
-    belly_color: profile.belly_color || profile.avatar_belly || 'white',
+    body_color: profile.body_color || profile.avatar_body || firstId('bodyColor', 'black'),
+    belly_color: profile.belly_color || profile.avatar_belly || firstId('bellyColor', 'white'),
     head_item: profile.head_item || 'none',
     shorts_item: profile.shorts_item || 'none',
     accessory_item: profile.accessory_item || 'none'
@@ -129,45 +117,11 @@ function save() {
 </script>
 
 <style scoped>
-.avatar-editor-clean{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:14px;
-  align-items:start;
-}
-
-.avatar-left,
-.avatar-right{
-  min-width:0;
-}
-
-.avatar-info-box{
-  margin-top:10px;
-  border:3px solid #c5a66f;
-  background:#fffdf6;
-  padding:9px;
-}
-
-.avatar-save-button{
-  margin-top:10px;
-}
-
-.avatar-message{
-  color:#1b7f24;
-  font-weight:800;
-}
-
-.avatar-error{
-  background:#fee2e2;
-  color:#991b1b;
-  border:3px solid #7f1d1d;
-  padding:10px;
-  font-weight:800;
-}
-
-@media(max-width:760px){
-  .avatar-editor-clean{
-    grid-template-columns:1fr;
-  }
-}
+.avatar-editor-clean{display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start}
+.avatar-left,.avatar-right{min-width:0}
+.avatar-info-box{margin-top:10px;border:3px solid #c5a66f;background:#fffdf6;padding:9px}
+.avatar-save-button{margin-top:10px}
+.avatar-message{color:#1b7f24;font-weight:800}
+.avatar-error{background:#fee2e2;color:#991b1b;border:3px solid #7f1d1d;padding:10px;font-weight:800}
+@media(max-width:760px){.avatar-editor-clean{grid-template-columns:1fr}}
 </style>
