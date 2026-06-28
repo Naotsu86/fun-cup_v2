@@ -33,7 +33,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { avatarOptions } from '../../services/avatarOptions'
+import { avatarOptions, getOptionFile } from '../../services/avatarOptions'
 
 const props = defineProps({
   avatar: {
@@ -43,7 +43,11 @@ const props = defineProps({
 })
 
 const base = import.meta.env.BASE_URL
-const baseAvatar = `${base}avatar/base/penguin_default.png`
+
+const baseAvatar = computed(() => {
+  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'penguin_black.png'
+  return `${base}avatar/base/${file}`
+})
 
 const headSrc = computed(() => layerSrc('headItem', 'head', props.avatar.head_item))
 const shortsSrc = computed(() => layerSrc('shortsItem', 'shorts', props.avatar.shorts_item))
