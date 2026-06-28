@@ -5,38 +5,54 @@
       <div class="avatar-cloud cloud-a"></div>
       <div class="avatar-cloud cloud-b"></div>
 
-      <img class="avatar-layer" :src="baseAvatar">
-      <img class="avatar-layer" :src="bellyAvatar">
+      <img class="avatar-layer" :src="baseAvatar" alt="Avatar" />
+      <img class="avatar-layer" :src="bellyAvatar" alt="" />
 
-      <img v-if="headSrc" class="avatar-layer" :src="headSrc">
-      <img v-if="shortsSrc" class="avatar-layer" :src="shortsSrc">
-      <img v-if="accessorySrc" class="avatar-layer" :src="accessorySrc">
+      <img v-if="headSrc" class="avatar-layer" :src="headSrc" alt="" />
+      <img v-if="shortsSrc" class="avatar-layer" :src="shortsSrc" alt="" />
+      <img v-if="accessorySrc" class="avatar-layer" :src="accessorySrc" alt="" />
     </div>
   </div>
 </template>
 
 <script setup>
-import {computed} from 'vue'
-import {avatarOptions,getOptionFile} from '../../services/avatarOptions'
-const props=defineProps({avatar:Object})
-const base=import.meta.env.BASE_URL
+import { computed } from 'vue'
+import { avatarOptions, getOptionFile } from '../../services/avatarOptions'
 
-const baseAvatar=computed(()=>`${base}avatar/base/${getOptionFile('bodyColor',props.avatar.body_color||'black')}`)
-const bellyAvatar=computed(()=>`${base}avatar/belly/${getOptionFile('bellyColor',props.avatar.belly_color||'white')}`)
+const props = defineProps({
+  avatar: {
+    type: Object,
+    required: true
+  }
+})
 
-function layer(group,folder,id){
- const o=avatarOptions[group]?.find(x=>x.id===id)
- return (!o||o.id==='none')?'':`${base}avatar/${folder}/${o.file}`
+const base = import.meta.env.BASE_URL
+
+const baseAvatar = computed(() => {
+  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'penguin_black.png'
+  return `${base}avatar/base/${file}`
+})
+
+const bellyAvatar = computed(() => {
+  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || 'penguin_belly_01_white.png'
+  return `${base}avatar/belly/${file}`
+})
+
+const headSrc = computed(() => layerSrc('headItem', 'head', props.avatar.head_item))
+const shortsSrc = computed(() => layerSrc('shortsItem', 'shorts', props.avatar.shorts_item))
+const accessorySrc = computed(() => layerSrc('accessoryItem', 'accessory', props.avatar.accessory_item))
+
+function layerSrc(optionGroup, folder, id) {
+  const option = avatarOptions[optionGroup]?.find(item => item.id === id)
+  if (!option || option.id === 'none') return ''
+  return `${base}avatar/${folder}/${option.file}`
 }
-const headSrc=computed(()=>layer('headItem','head',props.avatar.head_item))
-const shortsSrc=computed(()=>layer('shortsItem','shorts',props.avatar.shorts_item))
-const accessorySrc=computed(()=>layer('accessoryItem','accessory',props.avatar.accessory_item))
 </script>
 
 <style scoped>
-.avatar-stage{position:relative;width:230px;height:230px;overflow:hidden;border:3px solid #2b2115;
-background:linear-gradient(#7bd3ff 0 42%,#2f9bd1 42% 47%,#f8d98a 47% 68%,#e7b861 68%)}
-.avatar-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.avatar-preview-wrap{width:100%;display:grid;place-items:center}
+.avatar-stage{position:relative;width:230px;height:230px;overflow:hidden;border:3px solid #2b2115;background:linear-gradient(#7bd3ff 0 42%,#2f9bd1 42% 47%,#f8d98a 47% 68%,#e7b861 68%);box-shadow:4px 4px 0 rgba(0,0,0,.22)}
+.avatar-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;user-select:none;pointer-events:none}
 .avatar-sun{position:absolute;right:20px;top:16px;width:22px;height:22px;background:#ffd65a;border:3px solid #b97819;border-radius:50%}
 .avatar-cloud{position:absolute;height:10px;background:#fff;border-radius:8px;opacity:.8}
 .cloud-a{left:22px;top:30px;width:46px}.cloud-b{left:92px;top:20px;width:34px}
