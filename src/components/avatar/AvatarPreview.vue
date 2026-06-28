@@ -6,7 +6,7 @@
       <div class="avatar-cloud cloud-b"></div>
 
       <img class="avatar-layer" :src="baseAvatar" alt="Avatar" />
-      <img class="avatar-layer" :src="bellyAvatar" alt="" />
+      <img v-if="bellyAvatar" class="avatar-layer" :src="bellyAvatar" alt="" />
 
       <img v-if="headSrc" class="avatar-layer" :src="headSrc" alt="" />
       <img v-if="shortsSrc" class="avatar-layer" :src="shortsSrc" alt="" />
@@ -29,13 +29,13 @@ const props = defineProps({
 const base = import.meta.env.BASE_URL
 
 const baseAvatar = computed(() => {
-  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'penguin_black.png'
+  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || avatarOptions.bodyColor?.[0]?.file
   return `${base}avatar/base/${file}`
 })
 
 const bellyAvatar = computed(() => {
-  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || 'penguin_belly_01_white.png'
-  return `${base}avatar/belly/${file}`
+  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || avatarOptions.bellyColor?.[0]?.file
+  return file ? `${base}avatar/belly/${file}` : ''
 })
 
 const headSrc = computed(() => layerSrc('headItem', 'head', props.avatar.head_item))
