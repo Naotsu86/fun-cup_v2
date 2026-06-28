@@ -1,9 +1,7 @@
 <template>
   <div class="avatar-editor-clean">
     <div class="avatar-left">
-      <div class="avatar-frame">
-        <AvatarPreview :avatar="draft" />
-      </div>
+      <AvatarPreview :avatar="draft" />
 
       <div class="avatar-info-box">
         <div class="field">
@@ -15,15 +13,6 @@
           <label>AKA-Name</label>
           <input :value="akaName || '-'" disabled>
         </div>
-
-        <div class="field">
-          <label>Bio</label>
-          <textarea
-            v-model="draft.bio"
-            rows="4"
-            placeholder="Kurzer Text zu deinem Pinguin"
-          ></textarea>
-        </div>
       </div>
     </div>
 
@@ -31,6 +20,7 @@
       <AvatarPickerRow
         title="Körperfarbe"
         :label="label('bodyColor', draft.body_color)"
+        :swatch="swatch('bodyColor', draft.body_color)"
         @previous="change('bodyColor', 'body_color', -1)"
         @next="change('bodyColor', 'body_color', 1)"
       />
@@ -38,6 +28,7 @@
       <AvatarPickerRow
         title="Bauchfarbe"
         :label="label('bellyColor', draft.belly_color)"
+        :swatch="swatch('bellyColor', draft.belly_color)"
         @previous="change('bellyColor', 'belly_color', -1)"
         @next="change('bellyColor', 'belly_color', 1)"
       />
@@ -56,15 +47,12 @@
         @next="change('shortsItem', 'shorts_item', 1)"
       />
 
-      <AvatarPickerRow
-        title="Accessoire"
-        :label="label('accessoryItem', draft.accessory_item)"
-        locked-note="Krone und Umhang werden später freigeschaltet."
-        @previous="change('accessoryItem', 'accessory_item', -1)"
-        @next="change('accessoryItem', 'accessory_item', 1)"
+      <AvatarItemGrid
+        v-model="draft.accessory_item"
+        :unlocked-items="unlockedItems"
       />
 
-      <button class="btn primary full" @click="save" :disabled="saving">
+      <button class="btn primary full avatar-save-button" @click="save" :disabled="saving">
         {{ saving ? 'Speichern...' : 'Avatar speichern' }}
       </button>
 
@@ -78,7 +66,8 @@
 import { computed, reactive, watch } from 'vue'
 import AvatarPreview from './AvatarPreview.vue'
 import AvatarPickerRow from './AvatarPickerRow.vue'
-import { getNextOption, getOptionLabel } from '../../services/avatarOptions'
+import AvatarItemGrid from './AvatarItemGrid.vue'
+import { avatarOptions, getNextOption, getOptionLabel } from '../../services/avatarOptions'
 
 const props = defineProps({
   profile: {
@@ -118,13 +107,16 @@ function makeDraft(profile) {
     belly_color: profile.belly_color || profile.avatar_belly || 'white',
     head_item: profile.head_item || 'none',
     shorts_item: profile.shorts_item || 'none',
-    accessory_item: profile.accessory_item || 'none',
-    bio: profile.bio || ''
+    accessory_item: profile.accessory_item || 'none'
   }
 }
 
 function label(group, id) {
   return getOptionLabel(group, id)
+}
+
+function swatch(group, id) {
+  return avatarOptions[group]?.find(option => option.id === id)?.swatch || ''
 }
 
 function change(group, field, direction) {
@@ -139,8 +131,8 @@ function save() {
 <style scoped>
 .avatar-editor-clean{
   display:grid;
-  grid-template-columns:minmax(260px, 360px) 1fr;
-  gap:16px;
+  grid-template-columns:280px 1fr;
+  gap:14px;
   align-items:start;
 }
 
@@ -149,22 +141,15 @@ function save() {
   min-width:0;
 }
 
-.avatar-frame{
-  border:4px solid #2b2115;
-  background:
-    linear-gradient(180deg, #8bd5ff 0%, #bfeaff 48%, #64b75d 49%, #2f8a3b 100%);
-  padding:14px;
-  display:grid;
-  place-items:center;
-  box-shadow:4px 4px 0 rgba(0,0,0,.22);
-  overflow:hidden;
-}
-
 .avatar-info-box{
-  margin-top:12px;
+  margin-top:10px;
   border:3px solid #c5a66f;
   background:#fffdf6;
-  padding:10px;
+  padding:9px;
+}
+
+.avatar-save-button{
+  margin-top:10px;
 }
 
 .avatar-message{
@@ -183,10 +168,6 @@ function save() {
 @media(max-width:760px){
   .avatar-editor-clean{
     grid-template-columns:1fr;
-  }
-
-  .avatar-frame{
-    padding:10px;
   }
 }
 </style>

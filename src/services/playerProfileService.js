@@ -27,8 +27,7 @@ export async function updateMyAvatar(profileId, avatar) {
       avatar_belly: avatar.belly_color,
       head_item: avatar.head_item,
       shorts_item: avatar.shorts_item,
-      accessory_item: avatar.accessory_item,
-      bio: avatar.bio ?? null
+      accessory_item: avatar.accessory_item
     })
     .eq('id', profileId)
     .select()

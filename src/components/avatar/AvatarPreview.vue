@@ -1,6 +1,10 @@
 <template>
   <div class="avatar-preview-wrap">
     <div class="avatar-stage">
+      <div class="avatar-sun"></div>
+      <div class="avatar-cloud cloud-a"></div>
+      <div class="avatar-cloud cloud-b"></div>
+
       <img class="avatar-layer avatar-base" :src="baseAvatar" alt="Avatar" />
 
       <img
@@ -63,13 +67,55 @@ function layerSrc(optionGroup, folder, id) {
 
 .avatar-stage{
   position:relative;
-  width:min(240px, 72vw);
-  height:min(240px, 72vw);
-  max-width:240px;
-  max-height:240px;
+  width:min(230px, 70vw);
+  height:min(230px, 70vw);
+  max-width:230px;
+  max-height:230px;
   overflow:hidden;
   image-rendering:pixelated;
+  border:3px solid #2b2115;
+  background:
+    linear-gradient(180deg, #7bd3ff 0 42%, #2f9bd1 42% 47%, #f8d98a 47% 68%, #e7b861 68% 100%);
+  box-shadow:4px 4px 0 rgba(0,0,0,.22);
 }
+
+.avatar-stage::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:26%;
+  background:
+    radial-gradient(circle at 20% 70%, rgba(173,112,48,.35) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 42%, rgba(173,112,48,.35) 0 2px, transparent 3px),
+    linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0));
+  z-index:0;
+}
+
+.avatar-sun{
+  position:absolute;
+  right:20px;
+  top:16px;
+  width:22px;
+  height:22px;
+  background:#ffd65a;
+  border:3px solid #b97819;
+  border-radius:50%;
+  z-index:0;
+}
+
+.avatar-cloud{
+  position:absolute;
+  height:10px;
+  background:#fff;
+  border-radius:8px;
+  opacity:.8;
+  z-index:0;
+}
+
+.cloud-a{left:22px;top:30px;width:46px}
+.cloud-b{left:92px;top:20px;width:34px}
 
 .avatar-layer{
   position:absolute;

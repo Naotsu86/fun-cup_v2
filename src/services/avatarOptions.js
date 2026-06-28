@@ -1,16 +1,16 @@
 export const avatarOptions = {
   bodyColor: [
-    { id: 'black', label: 'Schwarz' },
-    { id: 'blue', label: 'Blau' },
-    { id: 'purple', label: 'Lila' },
-    { id: 'gray', label: 'Grau' }
+    { id: 'black', label: 'Schwarz', swatch: '#252525' },
+    { id: 'blue', label: 'Blau', swatch: '#2563eb' },
+    { id: 'purple', label: 'Lila', swatch: '#7c3aed' },
+    { id: 'gray', label: 'Grau', swatch: '#6b7280' }
   ],
 
   bellyColor: [
-    { id: 'white', label: 'Weiß' },
-    { id: 'cream', label: 'Creme' },
-    { id: 'mint', label: 'Mint' },
-    { id: 'pink', label: 'Rosa' }
+    { id: 'white', label: 'Weiß', swatch: '#fffaf0' },
+    { id: 'cream', label: 'Creme', swatch: '#f7d99b' },
+    { id: 'mint', label: 'Mint', swatch: '#bdf7d3' },
+    { id: 'pink', label: 'Rosa', swatch: '#ffc9df' }
   ],
 
   headItem: [
@@ -25,9 +25,9 @@ export const avatarOptions = {
   ],
 
   accessoryItem: [
-    { id: 'none', label: 'Keines', file: 'none.svg', unlocked: true },
-    { id: 'crown', label: 'Krone', file: 'none.svg', unlocked: false },
-    { id: 'cape', label: 'Umhang', file: 'none.svg', unlocked: false }
+    { id: 'none', label: 'Keines', file: 'none.svg', icon: '—', unlocked: true },
+    { id: 'crown', label: 'Krone', file: 'none.svg', icon: '👑', unlocked: false },
+    { id: 'cape', label: 'Umhang', file: 'none.svg', icon: '🧣', unlocked: false }
   ]
 }
 
@@ -48,4 +48,8 @@ export function getNextOption(group, currentId, direction = 1, unlockedIds = [])
   const nextIndex = (currentIndex + direction + available.length) % available.length
 
   return available[nextIndex].id
+}
+
+export function isOptionUnlocked(option, unlockedIds = []) {
+  return Boolean(option.unlocked || unlockedIds.includes(option.id))
 }
