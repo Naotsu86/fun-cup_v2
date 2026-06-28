@@ -32,12 +32,15 @@ export const avatarOptions = {
 }
 
 export function getOptionLabel(group, id) {
-  return avatarOptions[group]?.find(x => x.id === id)?.label || id || '-'
+  return avatarOptions[group]?.find(option => option.id === id)?.label || id || '-'
+}
+
+export function getAvailableOptions(group, unlockedIds = []) {
+  return (avatarOptions[group] || []).filter(option => option.unlocked || unlockedIds.includes(option.id))
 }
 
 export function getNextOption(group, currentId, direction = 1, unlockedIds = []) {
-  const options = avatarOptions[group] || []
-  const available = options.filter(option => option.unlocked || unlockedIds.includes(option.id))
+  const available = getAvailableOptions(group, unlockedIds)
 
   if (available.length === 0) return currentId
 

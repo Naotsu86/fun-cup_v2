@@ -1,14 +1,14 @@
 <template>
-  <div class="avatar-editor">
-    <div class="avatar-editor-left">
+  <div class="avatar-editor-clean">
+    <div class="avatar-left">
       <div class="avatar-frame">
-        <AvatarPreview :avatar="draft" :size="190" />
+        <AvatarPreview :avatar="draft" />
       </div>
 
-      <div class="avatar-profile-fields">
+      <div class="avatar-info-box">
         <div class="field">
           <label>Vorname</label>
-          <input :value="name" disabled>
+          <input :value="playerName" disabled>
         </div>
 
         <div class="field">
@@ -18,12 +18,16 @@
 
         <div class="field">
           <label>Bio</label>
-          <textarea v-model="draft.bio" rows="4" placeholder="Kurzer Text zu deinem Pinguin"></textarea>
+          <textarea
+            v-model="draft.bio"
+            rows="4"
+            placeholder="Kurzer Text zu deinem Pinguin"
+          ></textarea>
         </div>
       </div>
     </div>
 
-    <div class="avatar-editor-right">
+    <div class="avatar-right">
       <AvatarPickerRow
         title="Körperfarbe"
         :label="label('bodyColor', draft.body_color)"
@@ -55,17 +59,17 @@
       <AvatarPickerRow
         title="Accessoire"
         :label="label('accessoryItem', draft.accessory_item)"
-        :locked-note="lockedAccessoryHint"
+        locked-note="Krone und Umhang werden später freigeschaltet."
         @previous="change('accessoryItem', 'accessory_item', -1)"
         @next="change('accessoryItem', 'accessory_item', 1)"
       />
 
-      <button class="btn primary full avatar-save-button" @click="save" :disabled="saving">
+      <button class="btn primary full" @click="save" :disabled="saving">
         {{ saving ? 'Speichern...' : 'Avatar speichern' }}
       </button>
 
-      <p v-if="message" class="muted">{{ message }}</p>
-      <p v-if="error" class="error-small">{{ error }}</p>
+      <p v-if="message" class="avatar-message">{{ message }}</p>
+      <p v-if="error" class="avatar-error">{{ error }}</p>
     </div>
   </div>
 </template>
@@ -74,7 +78,7 @@
 import { computed, reactive, watch } from 'vue'
 import AvatarPreview from './AvatarPreview.vue'
 import AvatarPickerRow from './AvatarPickerRow.vue'
-import { avatarOptions, getNextOption, getOptionLabel } from '../../services/avatarOptions'
+import { getNextOption, getOptionLabel } from '../../services/avatarOptions'
 
 const props = defineProps({
   profile: {
@@ -104,14 +108,9 @@ watch(
   profile => Object.assign(draft, makeDraft(profile))
 )
 
-const name = computed(() => props.profile.players?.name || props.profile.display_name || '')
+const playerName = computed(() => props.profile.players?.name || props.profile.display_name || '')
 const akaName = computed(() => props.profile.players?.aka_name || '')
 const unlockedItems = computed(() => props.profile.unlocked_items || [])
-
-const lockedAccessoryHint = computed(() => {
-  const locked = avatarOptions.accessoryItem.filter(item => !item.unlocked)
-  return locked.length ? 'Krone und Umhang sind später freischaltbar.' : ''
-})
 
 function makeDraft(profile) {
   return {
@@ -136,3 +135,58 @@ function save() {
   emit('save', { ...draft })
 }
 </script>
+
+<style scoped>
+.avatar-editor-clean{
+  display:grid;
+  grid-template-columns:minmax(260px, 360px) 1fr;
+  gap:16px;
+  align-items:start;
+}
+
+.avatar-left,
+.avatar-right{
+  min-width:0;
+}
+
+.avatar-frame{
+  border:4px solid #2b2115;
+  background:
+    linear-gradient(180deg, #8bd5ff 0%, #bfeaff 48%, #64b75d 49%, #2f8a3b 100%);
+  padding:14px;
+  display:grid;
+  place-items:center;
+  box-shadow:4px 4px 0 rgba(0,0,0,.22);
+  overflow:hidden;
+}
+
+.avatar-info-box{
+  margin-top:12px;
+  border:3px solid #c5a66f;
+  background:#fffdf6;
+  padding:10px;
+}
+
+.avatar-message{
+  color:#1b7f24;
+  font-weight:800;
+}
+
+.avatar-error{
+  background:#fee2e2;
+  color:#991b1b;
+  border:3px solid #7f1d1d;
+  padding:10px;
+  font-weight:800;
+}
+
+@media(max-width:760px){
+  .avatar-editor-clean{
+    grid-template-columns:1fr;
+  }
+
+  .avatar-frame{
+    padding:10px;
+  }
+}
+</style>

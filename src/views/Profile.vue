@@ -115,8 +115,8 @@ async function saveAvatar(avatar) {
   saveError.value = ''
 
   try {
-    profile.value = await updateMyAvatar(profile.value.id, avatar)
-    await loadProfile()
+    await updateMyAvatar(profile.value.id, avatar)
+    profile.value = await getMyProfile()
     saveMessage.value = 'Avatar gespeichert.'
   } catch (e) {
     saveError.value = e.message || 'Avatar konnte nicht gespeichert werden.'
