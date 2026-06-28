@@ -38,8 +38,19 @@ export const avatarOptions = {
 
   shortsItem: [
     { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true },
-    { id: 'shorts', label: 'Shorts', file: 'none.svg', unlocked: true },
-    { id: 'skirt', label: 'Basketröckchen', file: 'none.svg', unlocked: true }
+    { id: 'black', label: 'Schwarze Shorts', file: 'shorts_black.png', unlocked: true, swatch: '#252525' },
+    { id: 'blue', label: 'Blaue Shorts', file: 'shorts_blue.png', unlocked: true, swatch: '#2563eb' },
+    { id: 'navy', label: 'Navy Shorts', file: 'shorts_navy.png', unlocked: true, swatch: '#1e3a8a' },
+    { id: 'teal', label: 'Türkise Shorts', file: 'shorts_teal.png', unlocked: true, swatch: '#0f766e' },
+    { id: 'green', label: 'Grüne Shorts', file: 'shorts_green.png', unlocked: true, swatch: '#16a34a' },
+    { id: 'lime', label: 'Lime Shorts', file: 'shorts_lime.png', unlocked: true, swatch: '#84cc16' },
+    { id: 'yellow', label: 'Gelbe Shorts', file: 'shorts_yellow.png', unlocked: true, swatch: '#eab308' },
+    { id: 'orange', label: 'Orange Shorts', file: 'shorts_orange.png', unlocked: true, swatch: '#f97316' },
+    { id: 'red', label: 'Rote Shorts', file: 'shorts_red.png', unlocked: true, swatch: '#dc2626' },
+    { id: 'pink', label: 'Rosa Shorts', file: 'shorts_pink.png', unlocked: true, swatch: '#ec4899' },
+    { id: 'purple', label: 'Lila Shorts', file: 'shorts_purple.png', unlocked: true, swatch: '#7c3aed' },
+    { id: 'brown', label: 'Braune Shorts', file: 'shorts_brown.png', unlocked: true, swatch: '#92400e' },
+    { id: 'gray', label: 'Graue Shorts', file: 'shorts_gray.png', unlocked: true, swatch: '#6b7280' }
   ],
 
   accessoryItem: [
