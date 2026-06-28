@@ -63,20 +63,7 @@ export const avatarOptions = {
     { id: 'pink', label: 'Pink Shorts', file: 'shorts_pink.png', unlocked: true, swatch: '#ec4899' },
     { id: 'purple', label: 'Lila Shorts', file: 'shorts_purple.png', unlocked: true, swatch: '#7c3aed' },
     { id: 'brown', label: 'Braun Shorts', file: 'shorts_brown.png', unlocked: true, swatch: '#92400e' },
-    { id: 'gray', label: 'Grau Shorts', file: 'shorts_gray.png', unlocked: true, swatch: '#6b7280' },
-    { id: 'skirt_black', label: 'Schwarz Rock', file: 'skirt_black.png', unlocked: true, swatch: '#252525' },
-    { id: 'skirt_blue', label: 'Blau Rock', file: 'skirt_blue.png', unlocked: true, swatch: '#2563eb' },
-    { id: 'skirt_navy', label: 'Navy Rock', file: 'skirt_navy.png', unlocked: true, swatch: '#1e3a8a' },
-    { id: 'skirt_teal', label: 'Türkis Rock', file: 'skirt_teal.png', unlocked: true, swatch: '#0f766e' },
-    { id: 'skirt_green', label: 'Grün Rock', file: 'skirt_green.png', unlocked: true, swatch: '#16a34a' },
-    { id: 'skirt_lime', label: 'Lime Rock', file: 'skirt_lime.png', unlocked: true, swatch: '#84cc16' },
-    { id: 'skirt_yellow', label: 'Gelb Rock', file: 'skirt_yellow.png', unlocked: true, swatch: '#eab308' },
-    { id: 'skirt_orange', label: 'Orange Rock', file: 'skirt_orange.png', unlocked: true, swatch: '#f97316' },
-    { id: 'skirt_red', label: 'Rot Rock', file: 'skirt_red.png', unlocked: true, swatch: '#dc2626' },
-    { id: 'skirt_pink', label: 'Pink Rock', file: 'skirt_pink.png', unlocked: true, swatch: '#ec4899' },
-    { id: 'skirt_purple', label: 'Lila Rock', file: 'skirt_purple.png', unlocked: true, swatch: '#7c3aed' },
-    { id: 'skirt_brown', label: 'Braun Rock', file: 'skirt_brown.png', unlocked: true, swatch: '#92400e' },
-    { id: 'skirt_gray', label: 'Grau Rock', file: 'skirt_gray.png', unlocked: true, swatch: '#6b7280' }
+    { id: 'gray', label: 'Grau Shorts', file: 'shorts_gray.png', unlocked: true, swatch: '#6b7280' }
   ],
 
   accessoryItem: [
