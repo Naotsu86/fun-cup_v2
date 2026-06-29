@@ -34,19 +34,19 @@ export const avatarOptions = {
 
   headItem: [
     { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true },
-    { id: 'cap_black', label: 'Schwarz Mütze', file: 'cap_black.png', unlocked: true, swatch: '#252525' },
-    { id: 'cap_blue', label: 'Blau Mütze', file: 'cap_blue.png', unlocked: true, swatch: '#2563eb' },
+    { id: 'cap_black', label: 'Schwarze Mütze', file: 'cap_black.png', unlocked: true, swatch: '#252525' },
+    { id: 'cap_blue', label: 'Blaue Mütze', file: 'cap_blue.png', unlocked: true, swatch: '#2563eb' },
     { id: 'cap_navy', label: 'Navy Mütze', file: 'cap_navy.png', unlocked: true, swatch: '#1e3a8a' },
     { id: 'cap_teal', label: 'Türkis Mütze', file: 'cap_teal.png', unlocked: true, swatch: '#0f766e' },
-    { id: 'cap_green', label: 'Grün Mütze', file: 'cap_green.png', unlocked: true, swatch: '#16a34a' },
+    { id: 'cap_green', label: 'Grüne Mütze', file: 'cap_green.png', unlocked: true, swatch: '#16a34a' },
     { id: 'cap_lime', label: 'Lime Mütze', file: 'cap_lime.png', unlocked: true, swatch: '#84cc16' },
-    { id: 'cap_yellow', label: 'Gelb Mütze', file: 'cap_yellow.png', unlocked: true, swatch: '#eab308' },
+    { id: 'cap_yellow', label: 'Gelbe Mütze', file: 'cap_yellow.png', unlocked: true, swatch: '#eab308' },
     { id: 'cap_orange', label: 'Orange Mütze', file: 'cap_orange.png', unlocked: true, swatch: '#f97316' },
-    { id: 'cap_red', label: 'Rot Mütze', file: 'cap_red.png', unlocked: true, swatch: '#dc2626' },
+    { id: 'cap_red', label: 'Rote Mütze', file: 'cap_red.png', unlocked: true, swatch: '#dc2626' },
     { id: 'cap_pink', label: 'Pink Mütze', file: 'cap_pink.png', unlocked: true, swatch: '#ec4899' },
     { id: 'cap_purple', label: 'Lila Mütze', file: 'cap_purple.png', unlocked: true, swatch: '#7c3aed' },
-    { id: 'cap_brown', label: 'Braun Mütze', file: 'cap_brown.png', unlocked: true, swatch: '#92400e' },
-    { id: 'cap_gray', label: 'Grau Mütze', file: 'cap_gray.png', unlocked: true, swatch: '#6b7280' }
+    { id: 'cap_brown', label: 'Braune Mütze', file: 'cap_brown.png', unlocked: true, swatch: '#92400e' },
+    { id: 'cap_gray', label: 'Graue Mütze', file: 'cap_gray.png', unlocked: true, swatch: '#6b7280' }
   ],
 
   shortsItem: [
