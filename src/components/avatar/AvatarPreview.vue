@@ -33,7 +33,7 @@ const baseAvatar = computed(() => {
 })
 
 const bellyAvatar = computed(() => {
-  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || 'belly_white.png'
+  const file = getOptionFile('bellyColor', props.avatar.belly_color || 'white') || 'penguin_belly_01_white.png'
   return `${base}avatar/belly/${file}`
 })
 
