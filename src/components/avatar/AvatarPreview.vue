@@ -52,7 +52,7 @@ function layerSrc(optionGroup, folder, id) {
 .avatar-preview-wrap{width:100%;display:grid;place-items:center}
 .avatar-stage{position:relative;width:230px;height:230px;overflow:hidden;border:3px solid #2b2115;background:linear-gradient(#7bd3ff 0 42%,#2f9bd1 42% 47%,#f8d98a 47% 68%,#e7b861 68%);box-shadow:4px 4px 0 rgba(0,0,0,.22)}
 .avatar-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;user-select:none;pointer-events:none}
-.layer-body{z-index:1}.layer-belly{z-index:2}.layer-shorts{z-index:3}.layer-head{z-index:4}.layer-accessory{z-index:5}
+.layer-body{z-index:2}.layer-belly{z-index:1}.layer-shorts{z-index:3}.layer-head{z-index:4}.layer-accessory{z-index:5}
 .avatar-sun{position:absolute;right:20px;top:16px;width:22px;height:22px;background:#ffd65a;border:3px solid #b97819;border-radius:50%;z-index:0}
 .avatar-cloud{position:absolute;height:10px;background:#fff;border-radius:8px;opacity:.8;z-index:0}
 .cloud-a{left:22px;top:30px;width:46px}.cloud-b{left:92px;top:20px;width:34px}
