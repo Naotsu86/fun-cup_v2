@@ -16,20 +16,19 @@ export const avatarOptions = {
   ],
 
   bellyColor: [
-    { id: 'white', label: 'Weiß', file: 'belly_white.png', swatch: '#fffaf0' },
-    { id: 'black', label: 'Schwarz', file: 'belly_black.png', swatch: '#252525' },
-    { id: 'blue', label: 'Blau', file: 'belly_blue.png', swatch: '#2563eb' },
-    { id: 'navy', label: 'Navy', file: 'belly_navy.png', swatch: '#1e3a8a' },
-    { id: 'teal', label: 'Türkis', file: 'belly_teal.png', swatch: '#0f766e' },
-    { id: 'green', label: 'Grün', file: 'belly_green.png', swatch: '#16a34a' },
-    { id: 'lime', label: 'Lime', file: 'belly_lime.png', swatch: '#84cc16' },
-    { id: 'yellow', label: 'Gelb', file: 'belly_yellow.png', swatch: '#eab308' },
-    { id: 'orange', label: 'Orange', file: 'belly_orange.png', swatch: '#f97316' },
-    { id: 'red', label: 'Rot', file: 'belly_red.png', swatch: '#dc2626' },
-    { id: 'pink', label: 'Pink', file: 'belly_pink.png', swatch: '#ec4899' },
-    { id: 'purple', label: 'Lila', file: 'belly_purple.png', swatch: '#7c3aed' },
-    { id: 'brown', label: 'Braun', file: 'belly_brown.png', swatch: '#92400e' },
-    { id: 'gray', label: 'Grau', file: 'belly_gray.png', swatch: '#6b7280' }
+    { id: 'white',  label: 'Weiß',    file: 'penguin_belly_01_white.png',  swatch: '#fffaf0' },
+    { id: 'blue',   label: 'Blau',    file: 'penguin_belly_02_blue.png',   swatch: '#2563eb' },
+    { id: 'navy',   label: 'Navy',    file: 'penguin_belly_03_navy.png',   swatch: '#1e3a8a' },
+    { id: 'teal',   label: 'Türkis',  file: 'penguin_belly_04_teal.png',   swatch: '#0f766e' },
+    { id: 'green',  label: 'Grün',    file: 'penguin_belly_05_green.png',  swatch: '#16a34a' },
+    { id: 'lime',   label: 'Lime',    file: 'penguin_belly_06_lime.png',   swatch: '#84cc16' },
+    { id: 'yellow', label: 'Gelb',    file: 'penguin_belly_07_yellow.png', swatch: '#eab308' },
+    { id: 'orange', label: 'Orange',  file: 'penguin_belly_08_orange.png', swatch: '#f97316' },
+    { id: 'red',    label: 'Rot',     file: 'penguin_belly_09_red.png',    swatch: '#dc2626' },
+    { id: 'pink',   label: 'Pink',    file: 'penguin_belly_10_pink.png',   swatch: '#ec4899' },
+    { id: 'purple', label: 'Lila',    file: 'penguin_belly_11_purple.png', swatch: '#7c3aed' },
+    { id: 'brown',  label: 'Braun',   file: 'penguin_belly_12_brown.png',  swatch: '#92400e' },
+    { id: 'gray',   label: 'Grau',    file: 'penguin_belly_13_gray.png',   swatch: '#6b7280' }
   ],
 
   headItem: [
