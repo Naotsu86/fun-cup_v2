@@ -1,5 +1,5 @@
 import { supabase } from '../api/supabase'
-import { recalcForm } from './generator'
+import { calculateForm } from './generator'
 export async function loadAll() {
   const [p,m,s,pp] = await Promise.all([
     supabase.from('players').select('*').order('created_at', { ascending:true }),
@@ -34,6 +34,6 @@ export async function updateMatch(id, patch){ const {error}=await supabase.from(
 export async function deleteMatch(id){ const {error}=await supabase.from('matches').delete().eq('id',id); if(error) throw error }
 export async function updateSettings(value){ const {error}=await supabase.from('settings').upsert({id:'main',value}); if(error) throw error }
 export async function updateForms(players, matches) {
-  const form = recalcForm(players, matches)
+  const form = calculateForm(players, matches)
   await Promise.all(players.map(p => supabase.from('players').update({ form: form[p.id] || 0 }).eq('id', p.id)))
 }
