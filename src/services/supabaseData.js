@@ -7,7 +7,8 @@ export async function loadAll() {
     supabase.from('settings').select('*').eq('id','main').maybeSingle(),
     supabase.from('player_profiles').select('player_id,body_color,belly_color,avatar_body,avatar_belly,head_item,shorts_item,accessory_item'),
   ])
-  if (p.error) throw p.error; if (m.error) throw m.error; if (s.error) throw s.error; if (pp.error) throw pp.error
+  if (p.error) throw p.error; if (m.error) throw m.error; if (s.error) throw s.error
+  if (pp.error) console.warn('player_profiles konnte nicht geladen werden:', pp.error.message)
 
   const profileByPlayerId = Object.fromEntries((pp.data || []).map(row => [row.player_id, row]))
   const players = (p.data || []).map(player => {
