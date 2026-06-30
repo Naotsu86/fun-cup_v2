@@ -79,9 +79,10 @@ function layerSrc(optionGroup, folder, id) {
 .cloud-a{left:22px;top:30px;width:46px}.cloud-b{left:92px;top:20px;width:34px}
 
 .avatar-preview-compact .avatar-stage{
-  width:56px;
-  height:56px;
-  border-width:2px;
+  width:100%;
+  height:100%;
+  border:none;
   box-shadow:none;
+  background:transparent;
 }
 </style>
