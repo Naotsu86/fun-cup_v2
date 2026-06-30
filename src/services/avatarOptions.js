@@ -15,21 +15,16 @@ export const avatarOptions = {
     { id: 'gray', label: 'Grau', file: 'body_gray.png', swatch: '#8A8D8F' }
   ],
 
-  // Belly, Eyes, Beak, Feet und Shadow sind aktuell feste, nicht einfärbbare Layer.
-  // Sobald farbige Varianten existieren, hier analog zu bodyColor erweitern.
   bellyColor: [
     { id: 'default', label: 'Standard', file: 'belly.png', swatch: '#FAF5EB' }
   ],
 
   headItem: [
     { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true }
-    // Noch keine head_item Assets in der neuen Library vorhanden.
-    // Sobald Aseprite-Dateien existieren, hier nach dem bodyColor-Muster ergänzen.
   ],
 
   shortsItem: [
     { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true }
-    // Noch keine shorts Assets in der neuen Library vorhanden.
   ],
 
   accessoryItem: [
@@ -59,7 +54,6 @@ export function getAvailableOptions(group, unlockedIds = []) {
 export function getNextOption(group, currentId, direction = 1, unlockedIds = []) {
   const available = getAvailableOptions(group, unlockedIds)
   if (available.length === 0) return currentId
-
   const currentIndex = Math.max(0, available.findIndex(option => option.id === currentId))
   const nextIndex = (currentIndex + direction + available.length) % available.length
   return available[nextIndex].id

@@ -41,7 +41,6 @@ const base = import.meta.env.BASE_URL
 const baseAvatar = computed(() => {
   const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'body_black.png'
   const url = `${base}avatar/${file}`
-  console.log('DEBUG AvatarPreview body_color:', props.avatar.body_color, '→ file:', file, '→ url:', url)
   return url
 })
 

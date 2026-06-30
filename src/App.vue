@@ -168,7 +168,6 @@ async function loadData() {
 
   try {
     const d = await loadAll()
-    console.log('DEBUG players[0]:', JSON.stringify(d.players[0]))
     players.value = d.players
     matches.value = d.matches
     settings.value = d.settings
