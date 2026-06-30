@@ -39,7 +39,7 @@ const base = import.meta.env.BASE_URL
 
 // Body ist der einzige einfärbbare Layer (mehrere Dateien je Farbe).
 const baseAvatar = computed(() => {
-  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'body_colors/body_black.png'
+  const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'body_black.png'
   return `${base}avatar/${file}`
 })
 
