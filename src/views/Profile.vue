@@ -74,7 +74,7 @@ import PlayerLoginPanel from '../components/auth/PlayerLoginPanel.vue'
 import PlayerRegisterPanel from '../components/auth/PlayerRegisterPanel.vue'
 import AvatarEditor from '../components/avatar/AvatarEditor.vue'
 import { getCurrentUser, signOut } from '../services/authV2'
-import { getMyProfile, updateMyAvatar } from '../services/playerProfileService'
+import { getMyProfile, updateMyAvatar, updateMyAkaName } from '../services/playerProfileService'
 
 const emit = defineEmits(['auth-changed'])
 
@@ -115,7 +115,9 @@ async function saveAvatar(avatar) {
   saveError.value = ''
 
   try {
-    await updateMyAvatar(profile.value.id, avatar)
+    const { aka_name, ...avatarFields } = avatar
+    await updateMyAvatar(profile.value.id, avatarFields)
+    await updateMyAkaName(aka_name)
     profile.value = await getMyProfile()
     saveMessage.value = 'Avatar gespeichert.'
   } catch (e) {

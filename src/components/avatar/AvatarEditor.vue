@@ -11,7 +11,7 @@
 
         <div class="field">
           <label>AKA-Name</label>
-          <input :value="akaName || '-'" disabled>
+          <input v-model="draft.aka_name" placeholder="-">
         </div>
       </div>
     </div>
@@ -52,7 +52,12 @@
         :unlocked-items="unlockedItems"
       />
 
-      <button class="btn primary full avatar-save-button" @click="save" :disabled="saving">
+      <button
+        v-if="isDirty"
+        class="btn primary full avatar-save-button"
+        @click="save"
+        :disabled="saving"
+      >
         {{ saving ? 'Speichern...' : 'Avatar speichern' }}
       </button>
 
@@ -78,12 +83,20 @@ const props = defineProps({
 
 const emit = defineEmits(['save'])
 const draft = reactive(makeDraft(props.profile))
+const initialSnapshot = reactive(makeDraft(props.profile))
 
-watch(() => props.profile, profile => Object.assign(draft, makeDraft(profile)))
+watch(() => props.profile, profile => {
+  const fresh = makeDraft(profile)
+  Object.assign(draft, fresh)
+  Object.assign(initialSnapshot, fresh)
+})
 
 const playerName = computed(() => props.profile.players?.name || props.profile.display_name || '')
-const akaName = computed(() => props.profile.players?.aka_name || '')
 const unlockedItems = computed(() => props.profile.unlocked_items || [])
+
+const isDirty = computed(() => {
+  return Object.keys(draft).some(key => draft[key] !== initialSnapshot[key])
+})
 
 function firstId(group, fallback) {
   return avatarOptions[group]?.[0]?.id || fallback
@@ -95,7 +108,8 @@ function makeDraft(profile) {
     belly_color: profile.belly_color || profile.avatar_belly || firstId('bellyColor', 'white'),
     head_item: profile.head_item || 'none',
     shorts_item: profile.shorts_item || 'none',
-    accessory_item: profile.accessory_item || 'none'
+    accessory_item: profile.accessory_item || 'none',
+    aka_name: profile.players?.aka_name || ''
   }
 }
 

@@ -36,3 +36,8 @@ export async function updateMyAvatar(profileId, avatar) {
   if (error) throw error
   return data
 }
+
+export async function updateMyAkaName(akaName) {
+  const { error } = await supabase.rpc('update_my_aka_name', { new_aka_name: akaName })
+  if (error) throw error
+}
