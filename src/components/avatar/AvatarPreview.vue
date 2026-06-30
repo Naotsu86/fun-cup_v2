@@ -79,6 +79,11 @@ function layerSrc(optionGroup, folder, id) {
 .avatar-cloud{position:absolute;height:10px;background:#fff;border-radius:8px;opacity:.8;z-index:0}
 .cloud-a{left:22px;top:30px;width:46px}.cloud-b{left:92px;top:20px;width:34px}
 
+.avatar-preview-compact{
+  width:100%;
+  height:100%;
+  display:block;
+}
 .avatar-preview-compact .avatar-stage{
   width:100%;
   height:100%;
