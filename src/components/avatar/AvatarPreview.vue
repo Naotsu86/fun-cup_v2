@@ -56,7 +56,7 @@ const accessorySrc = computed(() => layerSrc('accessoryItem', 'accessory', props
 
 function layerSrc(optionGroup, folder, id) {
   const file = getOptionFile(optionGroup, id || 'none')
-  if (!file || id === 'none') return ''
+  if (!file || file === 'none.svg' || id === 'none' || !id) return ''
   return `${base}avatar/${folder}/${file}`
 }
 </script>
