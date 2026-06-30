@@ -1,6 +1,8 @@
 <template>
   <div class="podium">
     <article v-for="(row, index) in topRows" :key="row.id" class="podium-card" :class="'place-' + (index + 1)">
+      <AvatarPreview :avatar="row" compact class="podium-avatar" />
+
       <div class="podium-content">
         <div class="podium-name">{{ row.name }}</div>
         <div class="podium-points">{{ row.points }} Punkte</div>
@@ -13,6 +15,8 @@
 </template>
 
 <script setup>
+import AvatarPreview from './avatar/AvatarPreview.vue'
+
 defineProps({ topRows: Array })
 
 const base = import.meta.env.BASE_URL
@@ -23,3 +27,13 @@ function badge(index) {
   return `${base}badges/third.png`
 }
 </script>
+
+<style scoped>
+.podium-card{
+  grid-template-columns: 56px 1fr 24px;
+}
+.podium-avatar{
+  width: 56px;
+  height: 56px;
+}
+</style>

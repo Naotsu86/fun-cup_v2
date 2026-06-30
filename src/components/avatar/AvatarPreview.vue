@@ -1,9 +1,11 @@
 <template>
-  <div class="avatar-preview-wrap">
+  <div class="avatar-preview-wrap" :class="{ 'avatar-preview-compact': compact }">
     <div class="avatar-stage">
-      <div class="avatar-sun"></div>
-      <div class="avatar-cloud cloud-a"></div>
-      <div class="avatar-cloud cloud-b"></div>
+      <template v-if="!compact">
+        <div class="avatar-sun"></div>
+        <div class="avatar-cloud cloud-a"></div>
+        <div class="avatar-cloud cloud-b"></div>
+      </template>
 
       <img class="avatar-layer layer-shadow" :src="shadowSrc" alt="" />
       <img class="avatar-layer layer-body" :src="baseAvatar" alt="Avatar" />
@@ -26,6 +28,10 @@ const props = defineProps({
   avatar: {
     type: Object,
     required: true
+  },
+  compact: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -71,4 +77,11 @@ function layerSrc(optionGroup, folder, id) {
 .avatar-sun{position:absolute;right:20px;top:16px;width:22px;height:22px;background:#ffd65a;border:3px solid #b97819;border-radius:50%;z-index:0}
 .avatar-cloud{position:absolute;height:10px;background:#fff;border-radius:8px;opacity:.8;z-index:0}
 .cloud-a{left:22px;top:30px;width:46px}.cloud-b{left:92px;top:20px;width:34px}
+
+.avatar-preview-compact .avatar-stage{
+  width:56px;
+  height:56px;
+  border-width:2px;
+  box-shadow:none;
+}
 </style>
