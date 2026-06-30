@@ -40,7 +40,9 @@ const base = import.meta.env.BASE_URL
 // Body ist der einzige einfärbbare Layer (mehrere Dateien je Farbe).
 const baseAvatar = computed(() => {
   const file = getOptionFile('bodyColor', props.avatar.body_color || 'black') || 'body_black.png'
-  return `${base}avatar/${file}`
+  const url = `${base}avatar/${file}`
+  console.log('DEBUG AvatarPreview body_color:', props.avatar.body_color, '→ file:', file, '→ url:', url)
+  return url
 })
 
 // Belly, Eyes, Beak, Feet, Shadow sind aktuell feste Einzeldateien (keine Farbvarianten).
