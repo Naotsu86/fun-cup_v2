@@ -1,18 +1,18 @@
 export const avatarOptions = {
   bodyColor: [
-    { id: 'black', label: 'Schwarz', file: 'body_colors/body_black.png', swatch: '#191B1C' },
-    { id: 'blue', label: 'Blau', file: 'body_colors/body_blue.png', swatch: '#2F7FC1' },
-    { id: 'navy', label: 'Navy', file: 'body_colors/body_navy.png', swatch: '#243B64' },
-    { id: 'teal', label: 'Türkis', file: 'body_colors/body_teal.png', swatch: '#209C9A' },
-    { id: 'green', label: 'Grün', file: 'body_colors/body_green.png', swatch: '#4E8E35' },
-    { id: 'lime', label: 'Lime', file: 'body_colors/body_lime.png', swatch: '#86B93D' },
-    { id: 'yellow', label: 'Gelb', file: 'body_colors/body_yellow.png', swatch: '#D8A91F' },
-    { id: 'orange', label: 'Orange', file: 'body_colors/body_orange.png', swatch: '#D96B1F' },
-    { id: 'red', label: 'Rot', file: 'body_colors/body_red.png', swatch: '#C94B3D' },
-    { id: 'pink', label: 'Pink', file: 'body_colors/body_pink.png', swatch: '#D96AA5' },
-    { id: 'purple', label: 'Lila', file: 'body_colors/body_purple.png', swatch: '#7B4A9E' },
-    { id: 'brown', label: 'Braun', file: 'body_colors/body_brown.png', swatch: '#7A4A28' },
-    { id: 'gray', label: 'Grau', file: 'body_colors/body_gray.png', swatch: '#8A8D8F' }
+    { id: 'black', label: 'Schwarz', file: 'body_black.png', swatch: '#191B1C' },
+    { id: 'blue', label: 'Blau', file: 'body_blue.png', swatch: '#2F7FC1' },
+    { id: 'navy', label: 'Navy', file: 'body_navy.png', swatch: '#243B64' },
+    { id: 'teal', label: 'Türkis', file: 'body_teal.png', swatch: '#209C9A' },
+    { id: 'green', label: 'Grün', file: 'body_green.png', swatch: '#4E8E35' },
+    { id: 'lime', label: 'Lime', file: 'body_lime.png', swatch: '#86B93D' },
+    { id: 'yellow', label: 'Gelb', file: 'body_yellow.png', swatch: '#D8A91F' },
+    { id: 'orange', label: 'Orange', file: 'body_orange.png', swatch: '#D96B1F' },
+    { id: 'red', label: 'Rot', file: 'body_red.png', swatch: '#C94B3D' },
+    { id: 'pink', label: 'Pink', file: 'body_pink.png', swatch: '#D96AA5' },
+    { id: 'purple', label: 'Lila', file: 'body_purple.png', swatch: '#7B4A9E' },
+    { id: 'brown', label: 'Braun', file: 'body_brown.png', swatch: '#7A4A28' },
+    { id: 'gray', label: 'Grau', file: 'body_gray.png', swatch: '#8A8D8F' }
   ],
 
   // Belly, Eyes, Beak, Feet und Shadow sind aktuell feste, nicht einfärbbare Layer.
