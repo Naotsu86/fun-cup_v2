@@ -1,68 +1,35 @@
 export const avatarOptions = {
   bodyColor: [
-    { id: 'black', label: 'Schwarz', file: 'penguin_black.png', swatch: '#252525' },
-    { id: 'blue', label: 'Blau', file: 'penguin_blue.png', swatch: '#2563eb' },
-    { id: 'navy', label: 'Navy', file: 'penguin_navy.png', swatch: '#1e3a8a' },
-    { id: 'teal', label: 'Türkis', file: 'penguin_teal.png', swatch: '#0f766e' },
-    { id: 'green', label: 'Grün', file: 'penguin_green.png', swatch: '#16a34a' },
-    { id: 'lime', label: 'Lime', file: 'penguin_lime.png', swatch: '#84cc16' },
-    { id: 'yellow', label: 'Gelb', file: 'penguin_yellow.png', swatch: '#eab308' },
-    { id: 'orange', label: 'Orange', file: 'penguin_orange.png', swatch: '#f97316' },
-    { id: 'red', label: 'Rot', file: 'penguin_red.png', swatch: '#dc2626' },
-    { id: 'pink', label: 'Pink', file: 'penguin_pink.png', swatch: '#ec4899' },
-    { id: 'purple', label: 'Lila', file: 'penguin_purple.png', swatch: '#7c3aed' },
-    { id: 'brown', label: 'Braun', file: 'penguin_brown.png', swatch: '#92400e' },
-    { id: 'gray', label: 'Grau', file: 'penguin_gray.png', swatch: '#6b7280' }
+    { id: 'black', label: 'Schwarz', file: 'body_colors/body_black.png', swatch: '#191B1C' },
+    { id: 'blue', label: 'Blau', file: 'body_colors/body_blue.png', swatch: '#2F7FC1' },
+    { id: 'navy', label: 'Navy', file: 'body_colors/body_navy.png', swatch: '#243B64' },
+    { id: 'teal', label: 'Türkis', file: 'body_colors/body_teal.png', swatch: '#209C9A' },
+    { id: 'green', label: 'Grün', file: 'body_colors/body_green.png', swatch: '#4E8E35' },
+    { id: 'lime', label: 'Lime', file: 'body_colors/body_lime.png', swatch: '#86B93D' },
+    { id: 'yellow', label: 'Gelb', file: 'body_colors/body_yellow.png', swatch: '#D8A91F' },
+    { id: 'orange', label: 'Orange', file: 'body_colors/body_orange.png', swatch: '#D96B1F' },
+    { id: 'red', label: 'Rot', file: 'body_colors/body_red.png', swatch: '#C94B3D' },
+    { id: 'pink', label: 'Pink', file: 'body_colors/body_pink.png', swatch: '#D96AA5' },
+    { id: 'purple', label: 'Lila', file: 'body_colors/body_purple.png', swatch: '#7B4A9E' },
+    { id: 'brown', label: 'Braun', file: 'body_colors/body_brown.png', swatch: '#7A4A28' },
+    { id: 'gray', label: 'Grau', file: 'body_colors/body_gray.png', swatch: '#8A8D8F' }
   ],
 
+  // Belly, Eyes, Beak, Feet und Shadow sind aktuell feste, nicht einfärbbare Layer.
+  // Sobald farbige Varianten existieren, hier analog zu bodyColor erweitern.
   bellyColor: [
-    { id: 'white',  label: 'Weiß',    file: 'penguin_belly_01_white.png',  swatch: '#fffaf0' },
-    { id: 'blue',   label: 'Blau',    file: 'penguin_belly_02_blue.png',   swatch: '#2563eb' },
-    { id: 'navy',   label: 'Navy',    file: 'penguin_belly_03_navy.png',   swatch: '#1e3a8a' },
-    { id: 'teal',   label: 'Türkis',  file: 'penguin_belly_04_teal.png',   swatch: '#0f766e' },
-    { id: 'green',  label: 'Grün',    file: 'penguin_belly_05_green.png',  swatch: '#16a34a' },
-    { id: 'lime',   label: 'Lime',    file: 'penguin_belly_06_lime.png',   swatch: '#84cc16' },
-    { id: 'yellow', label: 'Gelb',    file: 'penguin_belly_07_yellow.png', swatch: '#eab308' },
-    { id: 'orange', label: 'Orange',  file: 'penguin_belly_08_orange.png', swatch: '#f97316' },
-    { id: 'red',    label: 'Rot',     file: 'penguin_belly_09_red.png',    swatch: '#dc2626' },
-    { id: 'pink',   label: 'Pink',    file: 'penguin_belly_10_pink.png',   swatch: '#ec4899' },
-    { id: 'purple', label: 'Lila',    file: 'penguin_belly_11_purple.png', swatch: '#7c3aed' },
-    { id: 'brown',  label: 'Braun',   file: 'penguin_belly_12_brown.png',  swatch: '#92400e' },
-    { id: 'gray',   label: 'Grau',    file: 'penguin_belly_13_gray.png',   swatch: '#6b7280' }
+    { id: 'default', label: 'Standard', file: 'belly.png', swatch: '#FAF5EB' }
   ],
 
   headItem: [
-    { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true },
-    { id: 'cap_black', label: 'Schwarze Mütze', file: 'cap_black.png', unlocked: true, swatch: '#252525' },
-    { id: 'cap_blue', label: 'Blaue Mütze', file: 'cap_blue.png', unlocked: true, swatch: '#2563eb' },
-    { id: 'cap_navy', label: 'Navy Mütze', file: 'cap_navy.png', unlocked: true, swatch: '#1e3a8a' },
-    { id: 'cap_teal', label: 'Türkis Mütze', file: 'cap_teal.png', unlocked: true, swatch: '#0f766e' },
-    { id: 'cap_green', label: 'Grüne Mütze', file: 'cap_green.png', unlocked: true, swatch: '#16a34a' },
-    { id: 'cap_lime', label: 'Lime Mütze', file: 'cap_lime.png', unlocked: true, swatch: '#84cc16' },
-    { id: 'cap_yellow', label: 'Gelbe Mütze', file: 'cap_yellow.png', unlocked: true, swatch: '#eab308' },
-    { id: 'cap_orange', label: 'Orange Mütze', file: 'cap_orange.png', unlocked: true, swatch: '#f97316' },
-    { id: 'cap_red', label: 'Rote Mütze', file: 'cap_red.png', unlocked: true, swatch: '#dc2626' },
-    { id: 'cap_pink', label: 'Pink Mütze', file: 'cap_pink.png', unlocked: true, swatch: '#ec4899' },
-    { id: 'cap_purple', label: 'Lila Mütze', file: 'cap_purple.png', unlocked: true, swatch: '#7c3aed' },
-    { id: 'cap_brown', label: 'Braune Mütze', file: 'cap_brown.png', unlocked: true, swatch: '#92400e' },
-    { id: 'cap_gray', label: 'Graue Mütze', file: 'cap_gray.png', unlocked: true, swatch: '#6b7280' }
+    { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true }
+    // Noch keine head_item Assets in der neuen Library vorhanden.
+    // Sobald Aseprite-Dateien existieren, hier nach dem bodyColor-Muster ergänzen.
   ],
 
   shortsItem: [
-    { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true },
-    { id: 'black', label: 'Schwarz Shorts', file: 'shorts_black.png', unlocked: true, swatch: '#252525' },
-    { id: 'blue', label: 'Blau Shorts', file: 'shorts_blue.png', unlocked: true, swatch: '#2563eb' },
-    { id: 'navy', label: 'Navy Shorts', file: 'shorts_navy.png', unlocked: true, swatch: '#1e3a8a' },
-    { id: 'teal', label: 'Türkis Shorts', file: 'shorts_teal.png', unlocked: true, swatch: '#0f766e' },
-    { id: 'green', label: 'Grün Shorts', file: 'shorts_green.png', unlocked: true, swatch: '#16a34a' },
-    { id: 'lime', label: 'Lime Shorts', file: 'shorts_lime.png', unlocked: true, swatch: '#84cc16' },
-    { id: 'yellow', label: 'Gelb Shorts', file: 'shorts_yellow.png', unlocked: true, swatch: '#eab308' },
-    { id: 'orange', label: 'Orange Shorts', file: 'shorts_orange.png', unlocked: true, swatch: '#f97316' },
-    { id: 'red', label: 'Rot Shorts', file: 'shorts_red.png', unlocked: true, swatch: '#dc2626' },
-    { id: 'pink', label: 'Pink Shorts', file: 'shorts_pink.png', unlocked: true, swatch: '#ec4899' },
-    { id: 'purple', label: 'Lila Shorts', file: 'shorts_purple.png', unlocked: true, swatch: '#7c3aed' },
-    { id: 'brown', label: 'Braun Shorts', file: 'shorts_brown.png', unlocked: true, swatch: '#92400e' },
-    { id: 'gray', label: 'Grau Shorts', file: 'shorts_gray.png', unlocked: true, swatch: '#6b7280' }
+    { id: 'none', label: 'Keine', file: 'none.svg', unlocked: true }
+    // Noch keine shorts Assets in der neuen Library vorhanden.
   ],
 
   accessoryItem: [
