@@ -7,14 +7,9 @@
       </span>
 
       <div v-if="editable" class="match-actions">
-        <button
-          class="btn primary small-btn"
-          :disabled="savingDisabled"
-          @click="saveScore"
-        >
+        <button class="btn primary small-btn" :disabled="savingDisabled" @click="saveScore">
           Speichern
         </button>
-
         <button class="btn danger small-btn" @click="$emit('delete', match.id)">
           Löschen
         </button>
@@ -94,10 +89,25 @@ const versusIcon = `${base}icons/versus.png`
 
 const draftA = ref(toDraft(props.match.score_a))
 const draftB = ref(toDraft(props.match.score_b))
+const dirty = ref(false)
 
 watch(
   () => [props.match.score_a, props.match.score_b],
   ([scoreA, scoreB]) => {
+    const databaseA = normalizeScore(scoreA)
+    const databaseB = normalizeScore(scoreB)
+    const currentA = normalizeScore(draftA.value)
+    const currentB = normalizeScore(draftB.value)
+
+    if (dirty.value) {
+      if (databaseA === currentA && databaseB === currentB) {
+        dirty.value = false
+        draftA.value = toDraft(scoreA)
+        draftB.value = toDraft(scoreB)
+      }
+      return
+    }
+
     draftA.value = toDraft(scoreA)
     draftB.value = toDraft(scoreB)
   }
@@ -146,11 +156,12 @@ function clean(side) {
   } else {
     draftB.value = String(draftB.value || '').replace(/\D/g, '').slice(0, 2)
   }
+  dirty.value = true
 }
 
 function saveScore() {
   if (savingDisabled.value) return
-
+  dirty.value = true
   emit('score', {
     id: props.match.id,
     score_a: normalizedA.value,
@@ -160,69 +171,21 @@ function saveScore() {
 </script>
 
 <style scoped>
-.match.dirty{
-  box-shadow:4px 4px 0 rgba(199, 128, 24, .25);
-}
-
-.match-actions{
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-
-.score-editor-simple{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-
-.score-separator{
-  font-weight:950;
-  font-size:24px;
-  line-height:1;
-}
-
+.match.dirty{box-shadow:4px 4px 0 rgba(199,128,24,.25)}
+.match-actions{display:flex;gap:8px;align-items:center}
+.score-editor-simple{display:flex;align-items:center;justify-content:center;gap:8px}
+.score-separator{font-weight:950;font-size:24px;line-height:1}
 .score-input-simple{
-  width:64px;
-  height:48px;
-  padding:0;
-  text-align:center;
-  font-weight:950;
-  font-size:22px;
-  border:3px solid #b99b69;
-  background:#fffdf6;
-  -moz-appearance:textfield;
+  width:64px;height:48px;padding:0;text-align:center;font-weight:950;font-size:22px;
+  border:3px solid #b99b69;background:#fffdf6;-moz-appearance:textfield;
 }
-
 .score-input-simple::-webkit-outer-spin-button,
-.score-input-simple::-webkit-inner-spin-button{
-  -webkit-appearance:none;
-  margin:0;
-}
-
-.score-hint{
-  margin-top:4px;
-}
-
-.score-hint.unsaved{
-  color:#b45309;
-}
-
+.score-input-simple::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.score-hint{margin-top:4px}
+.score-hint.unsaved{color:#b45309}
 @media(max-width:760px){
-  .match-head{
-    display:block;
-  }
-
-  .match-actions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    margin-top:8px;
-  }
-
-  .score-input-simple{
-    width:68px;
-    height:50px;
-  }
+  .match-head{display:block}
+  .match-actions{display:grid;grid-template-columns:1fr 1fr;margin-top:8px}
+  .score-input-simple{width:68px;height:50px}
 }
 </style>
