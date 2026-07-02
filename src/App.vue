@@ -253,9 +253,17 @@ async function handleDeleteMatch(id) {
   })
 }
 
-async function handleScore({ id, side, value }) {
+async function handleScore(payload) {
   await run(async () => {
-    await updateMatch(id, { [side]: value })
+    if ('score_a' in payload || 'score_b' in payload) {
+      await updateMatch(payload.id, {
+        score_a: payload.score_a,
+        score_b: payload.score_b
+      })
+    } else {
+      await updateMatch(payload.id, { [payload.side]: payload.value })
+    }
+
     await loadData()
     await updateForms(players.value, matches.value)
     await loadData()
