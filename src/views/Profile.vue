@@ -34,8 +34,7 @@
             :saving="saving"
             :message="saveMessage"
             :error="saveError"
-            @save="saveAvatar"
-            @allocate-stats="allocateStats"
+            @save="saveProfile"
           />
 
           <template v-else>
@@ -107,7 +106,7 @@ async function loadProfile() {
   }
 }
 
-async function saveAvatar(profileChoices) {
+async function saveProfile(payload) {
   if (!profile.value) return
 
   saving.value = true
@@ -115,27 +114,24 @@ async function saveAvatar(profileChoices) {
   saveError.value = ''
 
   try {
-    await updateMyAvatar(profile.value.id, profileChoices)
+    await updateMyAvatar(profile.value.id, payload.profileChoices)
+
+    const points = payload.statPoints || {}
+    const spend =
+      Number(points.teamgeist || 0) +
+      Number(points.geschwindigkeit || 0) +
+      Number(points.kraft || 0) +
+      Number(points.technik || 0) +
+      Number(points.ehrgeiz || 0)
+
+    if (spend > 0) {
+      await allocateMyStatPoints(points)
+    }
+
     profile.value = await getMyProfile()
     saveMessage.value = 'Profil gespeichert.'
   } catch (e) {
     saveError.value = e.message || 'Profil konnte nicht gespeichert werden.'
-  } finally {
-    saving.value = false
-  }
-}
-
-async function allocateStats(points) {
-  saving.value = true
-  saveMessage.value = ''
-  saveError.value = ''
-
-  try {
-    await allocateMyStatPoints(points)
-    profile.value = await getMyProfile()
-    saveMessage.value = 'Punkte verteilt.'
-  } catch (e) {
-    saveError.value = e.message || 'Punkte konnten nicht verteilt werden.'
   } finally {
     saving.value = false
   }
