@@ -45,13 +45,8 @@
           <div class="xp-fill" :style="{ width: xpPercent + '%' }"></div>
         </div>
 
-        <div class="xp-text">
-          {{ xpTotal }} / {{ nextLevelXp }} XP
-        </div>
-
-        <div class="xp-next">
-          Noch {{ xpMissing }} XP bis Level {{ profileLevel + 1 }}
-        </div>
+        <div class="xp-text">{{ xpTotal }} / {{ nextLevelXp }} XP</div>
+        <div class="xp-next">Noch {{ xpMissing }} XP bis Level {{ profileLevel + 1 }}</div>
       </div>
     </aside>
 
@@ -96,58 +91,14 @@
           </div>
         </div>
 
-        <StatRow
-          icon="❤️"
-          label="TEAMGEIST"
-          :value="statValue('teamgeist')"
-          :pending="statDraft.teamgeist"
-          :can-add="availableAfterDraft > 0"
-          @add="addPoint('teamgeist')"
-        />
-
-        <StatRow
-          icon="⚡"
-          label="SPEED"
-          :value="statValue('geschwindigkeit')"
-          :pending="statDraft.geschwindigkeit"
-          :can-add="availableAfterDraft > 0"
-          @add="addPoint('geschwindigkeit')"
-        />
-
-        <StatRow
-          icon="💪"
-          label="KRAFT"
-          :value="statValue('kraft')"
-          :pending="statDraft.kraft"
-          :can-add="availableAfterDraft > 0"
-          @add="addPoint('kraft')"
-        />
-
-        <StatRow
-          icon="🎯"
-          label="TECHNIK"
-          :value="statValue('technik')"
-          :pending="statDraft.technik"
-          :can-add="availableAfterDraft > 0"
-          @add="addPoint('technik')"
-        />
-
-        <StatRow
-          icon="🔥"
-          label="EHRGEIZ"
-          :value="statValue('ehrgeiz')"
-          :pending="statDraft.ehrgeiz"
-          :can-add="availableAfterDraft > 0"
-          @add="addPoint('ehrgeiz')"
-        />
+        <StatRow icon="❤️" label="TEAMGEIST" :value="statValue('teamgeist')" :pending="statDraft.teamgeist" :can-add="availableAfterDraft > 0" @add="addPoint('teamgeist')" />
+        <StatRow icon="⚡" label="SPEED" :value="statValue('geschwindigkeit')" :pending="statDraft.geschwindigkeit" :can-add="availableAfterDraft > 0" @add="addPoint('geschwindigkeit')" />
+        <StatRow icon="💪" label="KRAFT" :value="statValue('kraft')" :pending="statDraft.kraft" :can-add="availableAfterDraft > 0" @add="addPoint('kraft')" />
+        <StatRow icon="🎯" label="TECHNIK" :value="statValue('technik')" :pending="statDraft.technik" :can-add="availableAfterDraft > 0" @add="addPoint('technik')" />
+        <StatRow icon="🔥" label="EHRGEIZ" :value="statValue('ehrgeiz')" :pending="statDraft.ehrgeiz" :can-add="availableAfterDraft > 0" @add="addPoint('ehrgeiz')" />
       </div>
 
-      <button
-        v-if="hasChanges"
-        class="btn primary full rpg-save-button"
-        @click="save"
-        :disabled="saving || availableAfterDraft < 0"
-      >
+      <button v-if="hasChanges" class="btn primary full rpg-save-button" @click="save" :disabled="saving || availableAfterDraft < 0">
         {{ saving ? 'SPEICHERN...' : 'PROFIL SPEICHERN' }}
       </button>
 
@@ -191,8 +142,8 @@ onMounted(loadChoices)
 
 const playerName = computed(() => props.profile.players?.name || props.profile.display_name || '')
 const unlockedItems = computed(() => props.profile.unlocked_items || [])
-const profileLevel = computed(() => Number(props.profile.level || 1))
 const xpTotal = computed(() => Number(props.profile.xp_total || 0))
+const profileLevel = computed(() => Number(props.profile.level || levelFromXp(xpTotal.value)))
 const currentLevelXp = computed(() => xpForLevel(profileLevel.value))
 const nextLevelXp = computed(() => xpForLevel(profileLevel.value + 1))
 const xpMissing = computed(() => Math.max(nextLevelXp.value - xpTotal.value, 0))
@@ -214,10 +165,7 @@ const pointsToSpend = computed(() =>
   Number(statDraft.ehrgeiz || 0)
 )
 
-const availableAfterDraft = computed(() =>
-  statPointsAvailable.value - pointsToSpend.value
-)
-
+const availableAfterDraft = computed(() => statPointsAvailable.value - pointsToSpend.value)
 const isProfileDirty = computed(() => Object.keys(initialSnapshot).some(key => draft[key] !== initialSnapshot[key]))
 const hasChanges = computed(() => isProfileDirty.value || pointsToSpend.value > 0)
 
@@ -238,26 +186,24 @@ function makeDraft(profile) {
 }
 
 function resetStatsDraft() {
-  return {
-    teamgeist: 0,
-    geschwindigkeit: 0,
-    kraft: 0,
-    technik: 0,
-    ehrgeiz: 0
-  }
+  return { teamgeist: 0, geschwindigkeit: 0, kraft: 0, technik: 0, ehrgeiz: 0 }
 }
 
-function xpForLevel(level) {
+function xpForLevel(targetLevel) {
   let needed = 0
-  for (let current = 1; current < level; current += 1) {
-    needed += current * 15 + 10
-  }
+  for (let current = 1; current < targetLevel; current += 1) needed += current * 15 + 10
   return needed
+}
+
+function levelFromXp(totalXp) {
+  let lvl = 1
+  while (totalXp >= xpForLevel(lvl + 1) && lvl < 99) lvl += 1
+  return lvl
 }
 
 async function loadChoices() {
   try {
-    const choices = await loadProfileChoices(props.profile)
+    const choices = await loadProfileChoices({ ...props.profile, level: profileLevel.value })
     titles.value = choices.titles
     attacks.value = choices.attacks
   } catch (error) {
@@ -285,7 +231,6 @@ function statValue(key) {
     technik: 'stat_technik',
     ehrgeiz: 'stat_ehrgeiz'
   }
-
   return Number(props.profile[map[key]] || 0)
 }
 
@@ -295,10 +240,7 @@ function addPoint(key) {
 }
 
 function save() {
-  emit('save', {
-    profileChoices: { ...draft },
-    statPoints: { ...statDraft }
-  })
+  emit('save', { profileChoices: { ...draft }, statPoints: { ...statDraft } })
 }
 
 const StatRow = defineComponent({
@@ -316,24 +258,16 @@ const StatRow = defineComponent({
     const width = computed(() => Math.max(0, Math.min(100, total.value)))
 
     return () => h('div', { class: 'rpg-stat-row' }, [
-      h('div', { class: 'rpg-stat-title' }, [
-        h('span', { class: 'stat-icon' }, rowProps.icon),
-        h('span', rowProps.label)
+      h('div', { class: 'rpg-stat-head' }, [
+        h('span', `${rowProps.icon} ${rowProps.label}`),
+        h('strong', String(total.value))
       ]),
       h('div', { class: 'rpg-stat-bar' }, [
         h('div', { class: 'rpg-stat-fill', style: { width: `${width.value}%` } })
       ]),
       h('div', { class: 'rpg-stat-footer' }, [
-        h('strong', String(total.value)),
-        rowProps.pending
-          ? h('span', { class: 'pending-points' }, `+${rowProps.pending}`)
-          : h('span', { class: 'pending-points empty' }, ''),
-        h('button', {
-          class: 'stat-plus-btn',
-          type: 'button',
-          disabled: !rowProps.canAdd,
-          onClick: () => rowEmit('add')
-        }, '+')
+        rowProps.pending ? h('span', { class: 'pending-points' }, `+${rowProps.pending}`) : h('span'),
+        h('button', { class: 'stat-plus-btn', type: 'button', disabled: !rowProps.canAdd, onClick: () => rowEmit('add') }, '+')
       ])
     ])
   }
@@ -341,226 +275,37 @@ const StatRow = defineComponent({
 </script>
 
 <style scoped>
-.rpg-profile-screen{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:14px;
-  align-items:start;
+.rpg-profile-screen{display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start}
+.rpg-left,.rpg-picker-panel,.rpg-stats-panel{border:3px solid #c5a66f;background:#fffdf6;padding:10px}
+.rpg-avatar-frame{display:grid;place-items:center;margin-bottom:10px}
+.rpg-field{margin-top:8px}
+.rpg-field label,.stats-header h3,.free-points span,.rpg-stat-head,.level-head span,.rpg-picker-panel :deep(.picker-title){
+  font-family:var(--font-pixel, 'Silkscreen', monospace);letter-spacing:2px;text-transform:uppercase
 }
-
-.rpg-left,
-.rpg-picker-panel,
-.rpg-stats-panel{
-  border:3px solid #c5a66f;
-  background:#fffdf6;
-  padding:10px;
-}
-
-.rpg-avatar-frame{
-  display:grid;
-  place-items:center;
-  margin-bottom:10px;
-}
-
-.rpg-field{
-  margin-top:8px;
-}
-
-.rpg-field label,
-.stats-header h3,
-.free-points span,
-.rpg-stat-title,
-.level-head span,
-.rpg-picker-panel :deep(.picker-title){
-  font-family:var(--font-pixel, 'Silkscreen', monospace);
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-
-.rpg-field label{
-  display:block;
-  color:#5f6f86;
-  font-size:11px;
-  margin-bottom:3px;
-}
-
-.rpg-field input,
-.rpg-field select{
-  width:100%;
-  border:3px solid #b99b69;
-  background:#fffdf6;
-  padding:9px;
-  font-weight:800;
-}
-
-.rpg-level-box{
-  margin-top:10px;
-  border:3px solid #2b2115;
-  background:#fff4d2;
-  padding:9px;
-}
-
-.level-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-bottom:6px;
-}
-
-.xp-bar{
-  height:18px;
-  border:3px solid #2b2115;
-  background:#fffdf6;
-  overflow:hidden;
-}
-
-.xp-fill{
-  height:100%;
-  background:linear-gradient(90deg, #84cc16, #22c55e);
-}
-
-.xp-text{
-  margin-top:5px;
-  font-weight:900;
-}
-
-.xp-next{
-  color:#5f6f86;
-  font-size:12px;
-}
-
-.rpg-right{
-  min-width:0;
-}
-
-.rpg-stats-panel{
-  margin-top:12px;
-}
-
-.stats-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:10px;
-}
-
-.stats-header h3{
-  margin:0;
-}
-
-.free-points{
-  text-align:right;
-  border:3px solid #2b2115;
-  background:#fff4d2;
-  padding:6px 10px;
-}
-
-.free-points span{
-  display:block;
-  font-size:10px;
-  color:#5f6f86;
-}
-
-.free-points strong{
-  font-size:22px;
-}
-
-.rpg-stat-row{
-  border:3px solid #d2b887;
-  background:#fffaf0;
-  padding:8px;
-  margin-top:8px;
-}
-
-.rpg-stat-title{
-  display:flex;
-  gap:6px;
-  align-items:center;
-  font-size:12px;
-  margin-bottom:6px;
-}
-
-.rpg-stat-bar{
-  height:18px;
-  border:3px solid #2b2115;
-  background:#fffdf6;
-  overflow:hidden;
-}
-
-.rpg-stat-fill{
-  height:100%;
-  background:linear-gradient(90deg, #fbbf24, #22c55e);
-}
-
-.rpg-stat-footer{
-  display:grid;
-  grid-template-columns:60px 1fr 46px;
-  gap:8px;
-  align-items:center;
-  margin-top:6px;
-}
-
-.rpg-stat-footer strong{
-  font-size:22px;
-}
-
-.pending-points{
-  color:#15803d;
-  font-weight:950;
-}
-
-.pending-points.empty{
-  visibility:hidden;
-}
-
-.stat-plus-btn{
-  width:46px;
-  height:38px;
-  border:3px solid #2b2115;
-  background:#d9f99d;
-  font-weight:950;
-  font-size:22px;
-  cursor:pointer;
-  box-shadow:3px 3px 0 rgba(0,0,0,.2);
-}
-
-.stat-plus-btn:disabled{
-  opacity:.35;
-  cursor:not-allowed;
-  box-shadow:none;
-}
-
-.rpg-save-button{
-  margin-top:12px;
-}
-
-.avatar-message{
-  color:#1b7f24;
-  font-weight:800;
-}
-
-.avatar-error{
-  background:#fee2e2;
-  color:#991b1b;
-  border:3px solid #7f1d1d;
-  padding:10px;
-  font-weight:800;
-}
-
-@media(max-width:760px){
-  .rpg-profile-screen{
-    grid-template-columns:1fr;
-  }
-
-  .stats-header{
-    align-items:stretch;
-    flex-direction:column;
-  }
-
-  .free-points{
-    text-align:left;
-  }
-}
+.rpg-field label{display:block;color:#5f6f86;font-size:11px;margin-bottom:3px}
+.rpg-field input,.rpg-field select{width:100%;border:3px solid #b99b69;background:#fffdf6;padding:9px;font-weight:800}
+.rpg-level-box{margin-top:10px;border:3px solid #2b2115;background:#fff4d2;padding:9px}
+.level-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.xp-bar,.rpg-stat-bar{height:18px;border:3px solid #2b2115;background:#fffdf6;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,#84cc16,#22c55e)}
+.xp-text{margin-top:5px;font-weight:900}
+.xp-next{color:#5f6f86;font-size:12px}
+.rpg-right{min-width:0}
+.rpg-stats-panel{margin-top:12px}
+.stats-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.stats-header h3{margin:0}
+.free-points{text-align:right;border:3px solid #2b2115;background:#fff4d2;padding:6px 10px}
+.free-points span{display:block;font-size:10px;color:#5f6f86}
+.free-points strong{font-size:22px}
+.rpg-stat-row{border:3px solid #d2b887;background:#fffaf0;padding:8px;margin-top:8px}
+.rpg-stat-head{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;margin-bottom:6px}
+.rpg-stat-fill{height:100%;background:linear-gradient(90deg,#fbbf24,#22c55e)}
+.rpg-stat-footer{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px}
+.pending-points{color:#15803d;font-weight:950}
+.stat-plus-btn{width:46px;height:38px;border:3px solid #2b2115;background:#d9f99d;font-weight:950;font-size:22px;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.2)}
+.stat-plus-btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.rpg-save-button{margin-top:12px}
+.avatar-message{color:#1b7f24;font-weight:800}
+.avatar-error{background:#fee2e2;color:#991b1b;border:3px solid #7f1d1d;padding:10px;font-weight:800}
+@media(max-width:760px){.rpg-profile-screen{grid-template-columns:1fr}.stats-header{align-items:stretch;flex-direction:column}.free-points{text-align:left}}
 </style>

@@ -12,29 +12,44 @@ export async function loadAll() {
   if (p.error) throw p.error
   if (m.error) throw m.error
   if (s.error) throw s.error
-
-  if (pc.error) {
-    console.warn('player_card_view konnte nicht geladen werden:', pc.error.message)
-  }
+  if (pc.error) console.warn('player_card_view konnte nicht geladen werden:', pc.error.message)
 
   const cardByPlayerId = Object.fromEntries((pc.data || []).map(row => [row.player_id, row]))
 
   const players = (p.data || []).map(player => {
-    const card = cardByPlayerId[player.id]
-
-    if (!card) return player
+    const card = cardByPlayerId[player.id] || {}
 
     return {
       ...player,
       ...card,
 
-      // Ranking braucht weiterhin die echte player.id
+      // Wichtig: Ranking/Matches brauchen weiterhin public.players.id
       id: player.id,
       name: player.name,
+      email: player.email,
       active: player.active,
       approved: player.approved,
       strength: player.strength,
       form: player.form,
+
+      // RPG/Spielerkarte
+      xp_total: Number(card.xp_total || 0),
+      calculated_level: Number(card.calculated_level || card.level || 1),
+      current_level_xp: Number(card.current_level_xp || 0),
+      next_level_xp: Number(card.next_level_xp || 25),
+      stat_points_total: Number(card.stat_points_total || 0),
+      stat_points_spent: Number(card.stat_points_spent || 0),
+      stat_points_available: Number(card.stat_points_available || 0),
+      stat_teamgeist: Number(card.stat_teamgeist || 0),
+      stat_geschwindigkeit: Number(card.stat_geschwindigkeit || 0),
+      stat_kraft: Number(card.stat_kraft || 0),
+      stat_technik: Number(card.stat_technik || 0),
+      stat_ehrgeiz: Number(card.stat_ehrgeiz || 0),
+      selected_title_id: card.selected_title_id || null,
+      selected_title_name: card.selected_title_name || null,
+      selected_special_attack_id: card.selected_special_attack_id || null,
+      selected_special_attack_name: card.selected_special_attack_name || null,
+      selected_special_attack_description: card.selected_special_attack_description || null,
 
       // Avatar-Kompatibilität
       body_color: card.body_color || player.body_color || 'black',

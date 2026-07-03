@@ -3,7 +3,7 @@
     <article class="player-card-modal pixel-card">
       <button class="player-card-close" type="button" @click="$emit('close')">×</button>
 
-      <h2><span class="headline-icon">🐧</span> Spielerkarte</h2>
+      <h2><span class="headline-icon">🐧</span> SPIELERKARTE</h2>
 
       <div class="player-card-main">
         <div class="player-card-avatar-box">
@@ -11,14 +11,14 @@
         </div>
 
         <div class="player-card-info">
-          <div class="title-label">Titel</div>
+          <div class="card-label">TITLE</div>
           <div class="player-card-title">{{ player.selected_title_name || 'Kein Titel' }}</div>
 
-          <div class="title-label">Name</div>
+          <div class="card-label">NAME</div>
           <div class="player-card-name">{{ player.name || player.real_name || '-' }}</div>
 
           <div class="special-box">
-            <div class="title-label">Spezialattacke</div>
+            <div class="card-label">SPECIAL</div>
             <strong>{{ player.selected_special_attack_name || 'Keine' }}</strong>
             <small v-if="player.selected_special_attack_description">
               {{ player.selected_special_attack_description }}
@@ -27,23 +27,23 @@
 
           <div class="level-box">
             <div class="level-head">
-              <strong>Level {{ player.calculated_level || 1 }}</strong>
-              <span>{{ player.xp_total || 0 }} XP</span>
+              <strong>LEVEL {{ level }}</strong>
+              <span>{{ xpTotal }} XP</span>
             </div>
             <div class="xp-bar">
               <div class="xp-fill" :style="{ width: xpPercent + '%' }"></div>
             </div>
-            <small>{{ xpText }}</small>
+            <small>{{ xpTotal }} / {{ nextLevelXp }} XP</small>
           </div>
         </div>
       </div>
 
       <div class="stat-list">
-        <StatRow icon="❤️" label="Teamgeist" :value="player.stat_teamgeist || 0" />
-        <StatRow icon="⚡" label="Geschwindigkeit" :value="player.stat_geschwindigkeit || 0" />
-        <StatRow icon="💪" label="Kraft" :value="player.stat_kraft || 0" />
-        <StatRow icon="🎯" label="Technik" :value="player.stat_technik || 0" />
-        <StatRow icon="🔥" label="Ehrgeiz" :value="player.stat_ehrgeiz || 0" />
+        <StatRow icon="❤️" label="TEAMGEIST" :value="player.stat_teamgeist || 0" />
+        <StatRow icon="⚡" label="SPEED" :value="player.stat_geschwindigkeit || 0" />
+        <StatRow icon="💪" label="KRAFT" :value="player.stat_kraft || 0" />
+        <StatRow icon="🎯" label="TECHNIK" :value="player.stat_technik || 0" />
+        <StatRow icon="🔥" label="EHRGEIZ" :value="player.stat_ehrgeiz || 0" />
       </div>
     </article>
   </div>
@@ -62,19 +62,29 @@ const props = defineProps({
 
 defineEmits(['close'])
 
-const currentLevelXp = computed(() => Number(props.player.current_level_xp || 0))
-const nextLevelXp = computed(() => Number(props.player.next_level_xp || currentLevelXp.value + 1))
 const xpTotal = computed(() => Number(props.player.xp_total || 0))
+const level = computed(() => Number(props.player.calculated_level || props.player.level || levelFromXp(xpTotal.value)))
+const currentLevelXp = computed(() => Number(props.player.current_level_xp || xpForLevel(level.value)))
+const nextLevelXp = computed(() => Number(props.player.next_level_xp || xpForLevel(level.value + 1)))
 
 const xpPercent = computed(() => {
   const range = Math.max(nextLevelXp.value - currentLevelXp.value, 1)
   return Math.max(0, Math.min(100, Math.round(((xpTotal.value - currentLevelXp.value) / range) * 100)))
 })
 
-const xpText = computed(() => {
-  if (!props.player.next_level_xp) return `${xpTotal.value} XP`
-  return `${xpTotal.value} / ${nextLevelXp.value} XP`
-})
+function xpForLevel(targetLevel) {
+  let needed = 0
+  for (let current = 1; current < targetLevel; current += 1) {
+    needed += current * 15 + 10
+  }
+  return needed
+}
+
+function levelFromXp(totalXp) {
+  let lvl = 1
+  while (totalXp >= xpForLevel(lvl + 1) && lvl < 99) lvl += 1
+  return lvl
+}
 
 const StatRow = defineComponent({
   name: 'StatRow',
@@ -84,17 +94,17 @@ const StatRow = defineComponent({
     value: Number
   },
   setup(rowProps) {
-    const width = computed(() => Math.max(0, Math.min(100, Number(rowProps.value || 0))))
+    const value = computed(() => Number(rowProps.value || 0))
+    const width = computed(() => Math.max(0, Math.min(100, value.value)))
 
-    return () => h('div', { class: 'stat-row' }, [
-      h('div', { class: 'stat-name' }, `${rowProps.icon} ${rowProps.label}`),
-      h('div', { class: 'stat-bar' }, [
-        h('div', {
-          class: 'stat-fill',
-          style: { width: `${width.value}%` }
-        })
+    return () => h('div', { class: 'card-stat-row' }, [
+      h('div', { class: 'card-stat-head' }, [
+        h('span', `${rowProps.icon} ${rowProps.label}`),
+        h('strong', String(value.value))
       ]),
-      h('div', { class: 'stat-value' }, String(rowProps.value || 0))
+      h('div', { class: 'card-stat-bar' }, [
+        h('div', { class: 'card-stat-fill', style: { width: `${width.value}%` } })
+      ])
     ])
   }
 })
@@ -148,10 +158,17 @@ const StatRow = defineComponent({
   padding:8px;
 }
 
-.title-label{
-  font-size:12px;
+.card-label,
+.card-stat-head,
+.level-head strong{
+  font-family:var(--font-pixel, 'Silkscreen', monospace);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.card-label{
+  font-size:11px;
   color:#5f6f86;
-  font-weight:800;
   margin-top:8px;
 }
 
@@ -161,6 +178,8 @@ const StatRow = defineComponent({
   color:#7c2d12;
   font-weight:900;
   margin-bottom:8px;
+  letter-spacing:2px;
+  text-transform:uppercase;
 }
 
 .player-card-name{
@@ -192,15 +211,14 @@ const StatRow = defineComponent({
 }
 
 .xp-bar,
-.stat-bar{
+.card-stat-bar{
   height:18px;
   border:3px solid #2b2115;
   background:#fffdf6;
   overflow:hidden;
 }
 
-.xp-fill,
-.stat-fill{
+.xp-fill{
   height:100%;
   background:linear-gradient(90deg, #84cc16, #22c55e);
 }
@@ -211,20 +229,24 @@ const StatRow = defineComponent({
   gap:8px;
 }
 
-.stat-row{
-  display:grid;
-  grid-template-columns:170px 1fr 42px;
+.card-stat-row{
+  border:3px solid #d2b887;
+  background:#fffaf0;
+  padding:8px;
+}
+
+.card-stat-head{
+  display:flex;
+  justify-content:space-between;
   gap:8px;
   align-items:center;
+  font-size:12px;
+  margin-bottom:6px;
 }
 
-.stat-name{
-  font-weight:900;
-}
-
-.stat-value{
-  text-align:right;
-  font-weight:950;
+.card-stat-fill{
+  height:100%;
+  background:linear-gradient(90deg, #fbbf24, #22c55e);
 }
 
 @media(max-width:760px){
@@ -235,15 +257,6 @@ const StatRow = defineComponent({
   .player-card-avatar-box{
     max-width:260px;
     margin:auto;
-  }
-
-  .stat-row{
-    grid-template-columns:1fr;
-    gap:4px;
-  }
-
-  .stat-value{
-    text-align:left;
   }
 }
 </style>
