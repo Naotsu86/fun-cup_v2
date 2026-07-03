@@ -35,12 +35,12 @@
             :message="saveMessage"
             :error="saveError"
             @save="saveAvatar"
+            @allocate-stats="allocateStats"
           />
 
           <template v-else>
-            <p><strong>Vorname:</strong><br>{{ profile.players?.name || profile.display_name }}</p>
-            <p><strong>AKA-Name:</strong><br>{{ profile.players?.aka_name || '-' }}</p>
-            <p class="muted">Avatarbearbeitung ist erst nach Admin-Freigabe möglich.</p>
+            <p><strong>Name:</strong><br>{{ profile.players?.name || profile.display_name }}</p>
+            <p class="muted">Profilbearbeitung ist erst nach Admin-Freigabe möglich.</p>
           </template>
         </template>
 
@@ -74,7 +74,7 @@ import PlayerLoginPanel from '../components/auth/PlayerLoginPanel.vue'
 import PlayerRegisterPanel from '../components/auth/PlayerRegisterPanel.vue'
 import AvatarEditor from '../components/avatar/AvatarEditor.vue'
 import { getCurrentUser, signOut } from '../services/authV2'
-import { getMyProfile, updateMyAvatar, updateMyAkaName } from '../services/playerProfileService'
+import { allocateMyStatPoints, getMyProfile, updateMyAvatar } from '../services/playerProfileService'
 
 const emit = defineEmits(['auth-changed'])
 
@@ -107,7 +107,7 @@ async function loadProfile() {
   }
 }
 
-async function saveAvatar(avatar) {
+async function saveAvatar(profileChoices) {
   if (!profile.value) return
 
   saving.value = true
@@ -115,13 +115,27 @@ async function saveAvatar(avatar) {
   saveError.value = ''
 
   try {
-    const { aka_name, ...avatarFields } = avatar
-    await updateMyAvatar(profile.value.id, avatarFields)
-    await updateMyAkaName(aka_name)
+    await updateMyAvatar(profile.value.id, profileChoices)
     profile.value = await getMyProfile()
-    saveMessage.value = 'Avatar gespeichert.'
+    saveMessage.value = 'Profil gespeichert.'
   } catch (e) {
-    saveError.value = e.message || 'Avatar konnte nicht gespeichert werden.'
+    saveError.value = e.message || 'Profil konnte nicht gespeichert werden.'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function allocateStats(points) {
+  saving.value = true
+  saveMessage.value = ''
+  saveError.value = ''
+
+  try {
+    await allocateMyStatPoints(points)
+    profile.value = await getMyProfile()
+    saveMessage.value = 'Punkte verteilt.'
+  } catch (e) {
+    saveError.value = e.message || 'Punkte konnten nicht verteilt werden.'
   } finally {
     saving.value = false
   }
