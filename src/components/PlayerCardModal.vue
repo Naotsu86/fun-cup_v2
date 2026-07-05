@@ -1,9 +1,11 @@
 <template>
   <div class="player-card-backdrop" @click.self="$emit('close')">
     <article class="player-card-modal pixel-card">
-      <button class="player-card-close" type="button" @click="$emit('close')">×</button>
+      <button class="player-card-close" type="button" @click="$emit('close')" aria-label="Schließen">
+        ×
+      </button>
 
-      <h2><span class="headline-icon">🐧</span> SPIELERKARTE</h2>
+      <h2>SPIELERKARTE</h2>
 
       <div class="player-card-main">
         <div class="player-card-avatar-box">
@@ -111,14 +113,28 @@ function levelFromXp(totalXp) {
 .player-card-close{
   position:absolute;
   top:8px;
-  right:10px;
-  width:36px;
-  height:36px;
-  border:3px solid #2b2115;
-  background:#fee2e2;
-  font-size:24px;
+  right:8px;
+  width:38px;
+  height:38px;
+  border:4px solid #2b2115;
+  background:#fffdf6;
+  color:#7f1d1d;
+  font-family:var(--font-pixel, 'Silkscreen', monospace);
+  font-size:22px;
   font-weight:950;
+  line-height:1;
+  display:grid;
+  place-items:center;
   cursor:pointer;
+  box-shadow:3px 3px 0 rgba(0,0,0,.25);
+}
+
+.player-card-close:hover{
+  background:#fee2e2;
+}
+
+.player-card-modal h2{
+  padding-right:46px;
 }
 
 .player-card-main{
