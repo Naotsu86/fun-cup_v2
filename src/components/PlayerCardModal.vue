@@ -9,21 +9,21 @@
 
       <div class="player-card-main">
         <div class="player-card-avatar-box">
-          <AvatarPreview :avatar="player" />
+          <AvatarPreview :avatar="card" />
         </div>
 
         <div class="player-card-info">
           <div class="card-label">TITLE</div>
-          <div class="player-card-title">{{ player.selected_title_name || 'Kein Titel' }}</div>
+          <div class="player-card-title">{{ card.selected_title_name || 'Kein Titel' }}</div>
 
           <div class="card-label">NAME</div>
-          <div class="player-card-name">{{ player.name || player.real_name || '-' }}</div>
+          <div class="player-card-name">{{ card.name || card.real_name || '-' }}</div>
 
           <div class="special-box">
             <div class="card-label">SPECIAL</div>
-            <strong>{{ player.selected_special_attack_name || 'Keine' }}</strong>
-            <small v-if="player.selected_special_attack_description">
-              {{ player.selected_special_attack_description }}
+            <strong>{{ card.selected_special_attack_name || 'Keine' }}</strong>
+            <small v-if="card.selected_special_attack_description">
+              {{ card.selected_special_attack_description }}
             </small>
           </div>
 
@@ -40,21 +40,25 @@
         </div>
       </div>
 
+      <p v-if="loading" class="muted">Spielerkarte wird geladen...</p>
+      <p v-if="loadError" class="card-error">{{ loadError }}</p>
+
       <div class="stat-list">
-        <PlayerCardStatRow icon="teamgeist" label="TEAMGEIST" color="red" :value="Number(player.stat_teamgeist || 0)" />
-        <PlayerCardStatRow icon="speed" label="SPEED" color="yellow" :value="Number(player.stat_geschwindigkeit || 0)" />
-        <PlayerCardStatRow icon="kraft" label="KRAFT" color="orange" :value="Number(player.stat_kraft || 0)" />
-        <PlayerCardStatRow icon="technik" label="TECHNIK" color="blue" :value="Number(player.stat_technik || 0)" />
-        <PlayerCardStatRow icon="ehrgeiz" label="EHRGEIZ" color="red" :value="Number(player.stat_ehrgeiz || 0)" />
+        <PlayerCardStatRow icon="teamgeist" label="TEAMGEIST" color="red" :value="Number(card.stat_teamgeist || 0)" />
+        <PlayerCardStatRow icon="speed" label="SPEED" color="yellow" :value="Number(card.stat_geschwindigkeit || 0)" />
+        <PlayerCardStatRow icon="kraft" label="KRAFT" color="orange" :value="Number(card.stat_kraft || 0)" />
+        <PlayerCardStatRow icon="technik" label="TECHNIK" color="blue" :value="Number(card.stat_technik || 0)" />
+        <PlayerCardStatRow icon="ehrgeiz" label="EHRGEIZ" color="red" :value="Number(card.stat_ehrgeiz || 0)" />
       </div>
     </article>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AvatarPreview from './avatar/AvatarPreview.vue'
 import PlayerCardStatRow from './PlayerCardStatRow.vue'
+import { supabase } from '../api/supabase'
 
 const props = defineProps({
   player: {
@@ -65,15 +69,76 @@ const props = defineProps({
 
 defineEmits(['close'])
 
-const xpTotal = computed(() => Number(props.player.xp_total || 0))
-const level = computed(() => Number(props.player.calculated_level || props.player.level || levelFromXp(xpTotal.value)))
-const currentLevelXp = computed(() => Number(props.player.current_level_xp || xpForLevel(level.value)))
-const nextLevelXp = computed(() => Number(props.player.next_level_xp || xpForLevel(level.value + 1)))
+const card = ref(normalizeCard(props.player))
+const loading = ref(false)
+const loadError = ref('')
+
+watch(() => props.player, async player => {
+  card.value = normalizeCard(player)
+  await loadFreshCard()
+})
+
+onMounted(loadFreshCard)
+
+const xpTotal = computed(() => Number(card.value.xp_total || 0))
+const level = computed(() => Number(card.value.calculated_level || card.value.level || levelFromXp(xpTotal.value)))
+const currentLevelXp = computed(() => Number(card.value.current_level_xp || xpForLevel(level.value)))
+const nextLevelXp = computed(() => Number(card.value.next_level_xp || xpForLevel(level.value + 1)))
 
 const xpPercent = computed(() => {
   const range = Math.max(nextLevelXp.value - currentLevelXp.value, 1)
   return Math.max(0, Math.min(100, Math.round(((xpTotal.value - currentLevelXp.value) / range) * 100)))
 })
+
+function normalizeCard(row) {
+  return {
+    ...row,
+    xp_total: Number(row?.xp_total || 0),
+    calculated_level: Number(row?.calculated_level || row?.level || 1),
+    current_level_xp: Number(row?.current_level_xp || 0),
+    next_level_xp: Number(row?.next_level_xp || 25),
+    stat_teamgeist: Number(row?.stat_teamgeist || 0),
+    stat_geschwindigkeit: Number(row?.stat_geschwindigkeit || 0),
+    stat_kraft: Number(row?.stat_kraft || 0),
+    stat_technik: Number(row?.stat_technik || 0),
+    stat_ehrgeiz: Number(row?.stat_ehrgeiz || 0),
+    body_color: row?.body_color || row?.avatar_body || 'black',
+    head_item: row?.head_item || 'none',
+    top_item: row?.top_item || 'none',
+    bottom_item: row?.bottom_item || row?.shorts_item || 'none',
+    shorts_item: row?.bottom_item || row?.shorts_item || 'none',
+    accessory_item: row?.accessory_item || 'none'
+  }
+}
+
+async function loadFreshCard() {
+  const playerId = props.player?.id || props.player?.player_id
+  if (!playerId) return
+
+  loading.value = true
+  loadError.value = ''
+
+  try {
+    const { data, error } = await supabase.rpc('get_player_cards')
+
+    if (error) throw error
+
+    const fresh = (data || []).find(row => row.player_id === playerId)
+
+    if (fresh) {
+      card.value = normalizeCard({
+        ...props.player,
+        ...fresh,
+        id: props.player.id,
+        name: props.player.name || fresh.real_name
+      })
+    }
+  } catch (error) {
+    loadError.value = error.message || 'Spielerkarte konnte nicht geladen werden.'
+  } finally {
+    loading.value = false
+  }
+}
 
 function xpForLevel(targetLevel) {
   let needed = 0
@@ -221,6 +286,14 @@ function levelFromXp(totalXp) {
   margin-top:16px;
   display:grid;
   gap:8px;
+}
+
+.card-error{
+  background:#fee2e2;
+  border:3px solid #7f1d1d;
+  color:#991b1b;
+  padding:8px;
+  font-weight:800;
 }
 
 @media(max-width:760px){
