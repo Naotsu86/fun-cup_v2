@@ -14,13 +14,38 @@ export async function getMyProfile() {
     .maybeSingle()
 
   if (error) throw error
-  return data
+
+  if (!data) return null
+
+  return {
+    ...data,
+    level: levelFromXp(Number(data.xp_total || 0))
+  }
 }
 
 export async function loadProfileChoices(profile) {
-  const level = Number(profile?.level || 1)
-
   const [titles, attacks] = await Promise.all([
+    supabase.rpc('get_my_unlocked_titles'),
+    supabase.rpc('get_my_available_special_attacks')
+  ])
+
+  if (!titles.error && !attacks.error) {
+    return {
+      // Im Dropdown zeigen wir nur wirklich freigeschaltete Titel.
+      // Dadurch ist direkt auswählbar, was erlaubt ist.
+      titles: (titles.data || []).filter(title => title.unlocked),
+      attacks: (attacks.data || []).filter(attack => attack.unlocked)
+    }
+  }
+
+  console.warn('RPC für Titel/Spezialattacken nicht verfügbar, nutze Fallback.', {
+    titles: titles.error?.message,
+    attacks: attacks.error?.message
+  })
+
+  const level = Number(profile?.level || levelFromXp(Number(profile?.xp_total || 0)))
+
+  const [fallbackTitles, fallbackAttacks] = await Promise.all([
     supabase
       .from('player_titles')
       .select('*')
@@ -34,24 +59,21 @@ export async function loadProfileChoices(profile) {
       .order('sort_order')
   ])
 
-  if (titles.error) throw titles.error
-  if (attacks.error) throw attacks.error
+  if (fallbackTitles.error) throw fallbackTitles.error
+  if (fallbackAttacks.error) throw fallbackAttacks.error
 
-  const unlockedTitles = (titles.data || []).map(title => {
-    const unlocked =
-      level >= Number(title.min_level || 1) &&
-      Number(profile?.stat_teamgeist || 0) >= Number(title.req_teamgeist || 0) &&
-      Number(profile?.stat_geschwindigkeit || 0) >= Number(title.req_geschwindigkeit || 0) &&
-      Number(profile?.stat_kraft || 0) >= Number(title.req_kraft || 0) &&
-      Number(profile?.stat_technik || 0) >= Number(title.req_technik || 0) &&
-      Number(profile?.stat_ehrgeiz || 0) >= Number(title.req_ehrgeiz || 0)
-
-    return { ...title, unlocked }
-  })
+  const unlockedTitles = (fallbackTitles.data || []).filter(title =>
+    level >= Number(title.min_level || 1) &&
+    Number(profile?.stat_teamgeist || 0) >= Number(title.req_teamgeist || 0) &&
+    Number(profile?.stat_geschwindigkeit || 0) >= Number(title.req_geschwindigkeit || 0) &&
+    Number(profile?.stat_kraft || 0) >= Number(title.req_kraft || 0) &&
+    Number(profile?.stat_technik || 0) >= Number(title.req_technik || 0) &&
+    Number(profile?.stat_ehrgeiz || 0) >= Number(title.req_ehrgeiz || 0)
+  )
 
   return {
     titles: unlockedTitles,
-    attacks: attacks.data || []
+    attacks: fallbackAttacks.data || []
   }
 }
 
@@ -104,4 +126,24 @@ export async function updateMyAvatar(profileId, avatar) {
     top_item: avatar.top_item,
     bottom_item: avatar.bottom_item || avatar.shorts_item
   })
+}
+
+function levelFromXp(totalXp) {
+  let lvl = 1
+
+  while (totalXp >= xpForLevel(lvl + 1) && lvl < 99) {
+    lvl += 1
+  }
+
+  return lvl
+}
+
+function xpForLevel(targetLevel) {
+  let needed = 0
+
+  for (let current = 1; current < targetLevel; current += 1) {
+    needed += current * 15 + 10
+  }
+
+  return needed
 }
