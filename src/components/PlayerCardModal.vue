@@ -39,11 +39,11 @@
       </div>
 
       <div class="stat-list">
-        <StatRow icon="❤️" label="TEAMGEIST" :value="player.stat_teamgeist || 0" />
-        <StatRow icon="⚡" label="SPEED" :value="player.stat_geschwindigkeit || 0" />
-        <StatRow icon="💪" label="KRAFT" :value="player.stat_kraft || 0" />
-        <StatRow icon="🎯" label="TECHNIK" :value="player.stat_technik || 0" />
-        <StatRow icon="🔥" label="EHRGEIZ" :value="player.stat_ehrgeiz || 0" />
+        <CardStat icon="teamgeist" label="TEAMGEIST" :value="player.stat_teamgeist || 0" />
+        <CardStat icon="speed" label="SPEED" :value="player.stat_geschwindigkeit || 0" />
+        <CardStat icon="kraft" label="KRAFT" :value="player.stat_kraft || 0" />
+        <CardStat icon="technik" label="TECHNIK" :value="player.stat_technik || 0" />
+        <CardStat icon="ehrgeiz" label="EHRGEIZ" :value="player.stat_ehrgeiz || 0" />
       </div>
     </article>
   </div>
@@ -53,14 +53,11 @@
 import { computed, defineComponent, h } from 'vue'
 import AvatarPreview from './avatar/AvatarPreview.vue'
 
-const props = defineProps({
-  player: {
-    type: Object,
-    required: true
-  }
-})
-
+const props = defineProps({ player: { type: Object, required: true } })
 defineEmits(['close'])
+
+const base = import.meta.env.BASE_URL
+const statIconPath = icon => `${base}stat-icons/${icon}.png`
 
 const xpTotal = computed(() => Number(props.player.xp_total || 0))
 const level = computed(() => Number(props.player.calculated_level || props.player.level || levelFromXp(xpTotal.value)))
@@ -74,9 +71,7 @@ const xpPercent = computed(() => {
 
 function xpForLevel(targetLevel) {
   let needed = 0
-  for (let current = 1; current < targetLevel; current += 1) {
-    needed += current * 15 + 10
-  }
+  for (let current = 1; current < targetLevel; current += 1) needed += current * 15 + 10
   return needed
 }
 
@@ -86,20 +81,19 @@ function levelFromXp(totalXp) {
   return lvl
 }
 
-const StatRow = defineComponent({
-  name: 'StatRow',
-  props: {
-    icon: String,
-    label: String,
-    value: Number
-  },
+const CardStat = defineComponent({
+  name: 'CardStat',
+  props: { icon: String, label: String, value: Number },
   setup(rowProps) {
     const value = computed(() => Number(rowProps.value || 0))
     const width = computed(() => Math.max(0, Math.min(100, value.value)))
 
     return () => h('div', { class: 'card-stat-row' }, [
       h('div', { class: 'card-stat-head' }, [
-        h('span', `${rowProps.icon} ${rowProps.label}`),
+        h('div', { class: 'card-stat-title-wrap' }, [
+          h('img', { class: 'card-stat-icon', src: statIconPath(rowProps.icon), alt: '' }),
+          h('span', rowProps.label)
+        ]),
         h('strong', String(value.value))
       ]),
       h('div', { class: 'card-stat-bar' }, [
@@ -111,152 +105,25 @@ const StatRow = defineComponent({
 </script>
 
 <style scoped>
-.player-card-backdrop{
-  position:fixed;
-  inset:0;
-  z-index:1000;
-  display:grid;
-  place-items:center;
-  padding:16px;
-  background:rgba(15,23,42,.58);
-}
-
-.player-card-modal{
-  position:relative;
-  width:min(720px, 96vw);
-  max-height:92vh;
-  overflow:auto;
-  border:5px solid #2b2115;
-  background:#fff4d2;
-  padding:16px;
-  box-shadow:8px 8px 0 rgba(0,0,0,.28);
-}
-
-.player-card-close{
-  position:absolute;
-  top:8px;
-  right:10px;
-  width:36px;
-  height:36px;
-  border:3px solid #2b2115;
-  background:#fee2e2;
-  font-size:24px;
-  font-weight:950;
-  cursor:pointer;
-}
-
-.player-card-main{
-  display:grid;
-  grid-template-columns:260px 1fr;
-  gap:16px;
-  align-items:start;
-}
-
-.player-card-avatar-box{
-  border:4px solid #2b2115;
-  background:#fffdf6;
-  padding:8px;
-}
-
-.card-label,
-.card-stat-head,
-.level-head strong{
-  font-family:var(--font-pixel, 'Silkscreen', monospace);
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-
-.card-label{
-  font-size:11px;
-  color:#5f6f86;
-  margin-top:8px;
-}
-
-.player-card-title{
-  font-family:var(--font-pixel, 'Silkscreen', monospace);
-  font-size:20px;
-  color:#7c2d12;
-  font-weight:900;
-  margin-bottom:8px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-
-.player-card-name{
-  font-size:28px;
-  font-weight:950;
-  margin-bottom:14px;
-}
-
-.special-box,
-.level-box{
-  border:3px solid #b89354;
-  background:#fffdf6;
-  padding:10px;
-  margin-top:10px;
-}
-
-.special-box small{
-  display:block;
-  margin-top:5px;
-  color:#5f6f86;
-}
-
-.level-head{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  align-items:center;
-  margin-bottom:6px;
-}
-
-.xp-bar,
-.card-stat-bar{
-  height:18px;
-  border:3px solid #2b2115;
-  background:#fffdf6;
-  overflow:hidden;
-}
-
-.xp-fill{
-  height:100%;
-  background:linear-gradient(90deg, #84cc16, #22c55e);
-}
-
-.stat-list{
-  margin-top:16px;
-  display:grid;
-  gap:8px;
-}
-
-.card-stat-row{
-  border:3px solid #d2b887;
-  background:#fffaf0;
-  padding:8px;
-}
-
-.card-stat-head{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  align-items:center;
-  font-size:12px;
-  margin-bottom:6px;
-}
-
-.card-stat-fill{
-  height:100%;
-  background:linear-gradient(90deg, #fbbf24, #22c55e);
-}
-
-@media(max-width:760px){
-  .player-card-main{
-    grid-template-columns:1fr;
-  }
-
-  .player-card-avatar-box{
-    max-width:260px;
-    margin:auto;
-  }
-}
+.player-card-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:rgba(15,23,42,.58)}
+.player-card-modal{position:relative;width:min(720px,96vw);max-height:92vh;overflow:auto;border:5px solid #2b2115;background:#fff4d2;padding:16px;box-shadow:8px 8px 0 rgba(0,0,0,.28)}
+.player-card-close{position:absolute;top:8px;right:10px;width:36px;height:36px;border:3px solid #2b2115;background:#fee2e2;font-size:24px;font-weight:950;cursor:pointer}
+.player-card-main{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+.player-card-avatar-box{border:4px solid #2b2115;background:#fffdf6;padding:8px}
+.card-label,.card-stat-head,.level-head strong{font-family:var(--font-pixel,'Silkscreen',monospace);letter-spacing:2px;text-transform:uppercase}
+.card-label{font-size:11px;color:#5f6f86;margin-top:8px}
+.player-card-title{font-family:var(--font-pixel,'Silkscreen',monospace);font-size:20px;color:#7c2d12;font-weight:900;margin-bottom:8px;letter-spacing:2px;text-transform:uppercase}
+.player-card-name{font-size:28px;font-weight:950;margin-bottom:14px}
+.special-box,.level-box{border:3px solid #b89354;background:#fffdf6;padding:10px;margin-top:10px}
+.special-box small{display:block;margin-top:5px;color:#5f6f86}
+.level-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px}
+.xp-bar,.card-stat-bar{height:18px;border:3px solid #2b2115;background:#fffdf6;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,#84cc16,#22c55e)}
+.stat-list{margin-top:16px;display:grid;gap:8px}
+.card-stat-row{border:3px solid #d2b887;background:#fffaf0;padding:8px}
+.card-stat-head{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;margin-bottom:6px}
+.card-stat-title-wrap{display:flex;align-items:center;gap:8px}
+.card-stat-icon{width:34px;height:34px;object-fit:contain;image-rendering:pixelated}
+.card-stat-fill{height:100%;background:linear-gradient(90deg,#fbbf24,#22c55e)}
+@media(max-width:760px){.player-card-main{grid-template-columns:1fr}.player-card-avatar-box{max-width:260px;margin:auto}}
 </style>
