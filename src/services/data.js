@@ -23,7 +23,6 @@ export async function loadAll() {
       ...player,
       ...card,
 
-      // Wichtig: Ranking/Matches brauchen weiterhin public.players.id
       id: player.id,
       name: player.name,
       email: player.email,
@@ -32,7 +31,6 @@ export async function loadAll() {
       strength: player.strength,
       form: player.form,
 
-      // RPG/Spielerkarte
       xp_total: Number(card.xp_total || 0),
       calculated_level: Number(card.calculated_level || card.level || 1),
       current_level_xp: Number(card.current_level_xp || 0),
@@ -51,7 +49,6 @@ export async function loadAll() {
       selected_special_attack_name: card.selected_special_attack_name || null,
       selected_special_attack_description: card.selected_special_attack_description || null,
 
-      // Avatar-Kompatibilität
       body_color: card.body_color || player.body_color || 'black',
       head_item: card.head_item || player.head_item || 'none',
       top_item: card.top_item || player.top_item || 'none',
