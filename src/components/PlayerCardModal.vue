@@ -117,13 +117,21 @@ const CardStat = defineComponent({
 .special-box,.level-box{border:3px solid #b89354;background:#fffdf6;padding:10px;margin-top:10px}
 .special-box small{display:block;margin-top:5px;color:#5f6f86}
 .level-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px}
-.xp-bar,.card-stat-bar{height:18px;border:3px solid #2b2115;background:#fffdf6;overflow:hidden}
-.xp-fill{height:100%;background:linear-gradient(90deg,#84cc16,#22c55e)}
+.xp-bar,.card-stat-bar{
+  height:20px;
+  border:3px solid #2b2115;
+  background:
+    repeating-linear-gradient(90deg, rgba(43,33,21,.18) 0 2px, transparent 2px 18px),
+    linear-gradient(#f8edc8 0 45%, #e1c990 45% 55%, #c9a96a 55% 100%);
+  overflow:hidden;
+  image-rendering:pixelated;
+}
+.xp-fill{height:100%;background:linear-gradient(#6ee036 0 42%, #32b42e 42% 58%, #15803d 58%);box-shadow:inset 0 3px 0 rgba(255,255,255,.45), inset 0 -4px 0 rgba(0,0,0,.18)}
 .stat-list{margin-top:16px;display:grid;gap:8px}
 .card-stat-row{border:3px solid #d2b887;background:#fffaf0;padding:8px}
 .card-stat-head{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;margin-bottom:6px}
 .card-stat-title-wrap{display:flex;align-items:center;gap:8px}
 .card-stat-icon{width:34px;height:34px;object-fit:contain;image-rendering:pixelated}
-.card-stat-fill{height:100%;background:linear-gradient(90deg,#fbbf24,#22c55e)}
+.card-stat-fill{height:100%;background:linear-gradient(#fbbf24 0 42%, #22c55e 42% 58%, #15803d 58%);box-shadow:inset 0 3px 0 rgba(255,255,255,.45), inset 0 -4px 0 rgba(0,0,0,.18)}
 @media(max-width:760px){.player-card-main{grid-template-columns:1fr}.player-card-avatar-box{max-width:260px;margin:auto}}
 </style>
