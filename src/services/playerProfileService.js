@@ -14,7 +14,6 @@ export async function getMyProfile() {
     .maybeSingle()
 
   if (error) throw error
-
   if (!data) return null
 
   return {
@@ -31,8 +30,6 @@ export async function loadProfileChoices(profile) {
 
   if (!titles.error && !attacks.error) {
     return {
-      // Im Dropdown zeigen wir nur wirklich freigeschaltete Titel.
-      // Dadurch ist direkt auswählbar, was erlaubt ist.
       titles: (titles.data || []).filter(title => title.unlocked),
       attacks: (attacks.data || []).filter(attack => attack.unlocked)
     }
@@ -46,17 +43,8 @@ export async function loadProfileChoices(profile) {
   const level = Number(profile?.level || levelFromXp(Number(profile?.xp_total || 0)))
 
   const [fallbackTitles, fallbackAttacks] = await Promise.all([
-    supabase
-      .from('player_titles')
-      .select('*')
-      .eq('active', true)
-      .order('sort_order'),
-    supabase
-      .from('special_attacks')
-      .select('*')
-      .eq('active', true)
-      .lte('min_level', level)
-      .order('sort_order')
+    supabase.from('player_titles').select('*').eq('active', true).order('sort_order'),
+    supabase.from('special_attacks').select('*').eq('active', true).lte('min_level', level).order('sort_order')
   ])
 
   if (fallbackTitles.error) throw fallbackTitles.error
@@ -130,20 +118,14 @@ export async function updateMyAvatar(profileId, avatar) {
 
 function levelFromXp(totalXp) {
   let lvl = 1
-
-  while (totalXp >= xpForLevel(lvl + 1) && lvl < 99) {
-    lvl += 1
-  }
-
+  while (totalXp >= xpForLevel(lvl + 1) && lvl < 99) lvl += 1
   return lvl
 }
 
 function xpForLevel(targetLevel) {
   let needed = 0
-
   for (let current = 1; current < targetLevel; current += 1) {
     needed += current * 15 + 10
   }
-
   return needed
 }
