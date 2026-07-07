@@ -1,7 +1,6 @@
 <template>
   <div class="card pixel-card menu-window admin-rpg-catalog">
     <h2>🏷️ Titel & Spezialattacken</h2>
-
     <div class="menu-body">
       <div class="catalog-tabs">
         <button class="btn" :class="{ primary: tab === 'titles' }" @click="tab = 'titles'">Titel</button>
@@ -14,97 +13,34 @@
 
       <template v-if="tab === 'titles'">
         <button class="btn primary full" @click="addTitle">Neuen Titel anlegen</button>
-
-        <div class="catalog-list">
-          <div v-for="row in titles" :key="row._key" class="catalog-row">
-            <div class="catalog-grid title-grid">
-              <div class="field id-field">
-                <label>Nr.</label>
-                <input :value="row.id || 'neu'" disabled>
-              </div>
-
-              <div class="field">
-                <label>Name</label>
-                <input v-model="row.name">
-              </div>
-
-              <div class="field wide">
-                <label>Beschreibung</label>
-                <input v-model="row.description">
-              </div>
-
-              <div class="field"><label>Level</label><input type="number" min="1" v-model.number="row.min_level"></div>
-              <div class="field"><label>Teamgeist</label><input type="number" min="0" v-model.number="row.req_teamgeist"></div>
-              <div class="field"><label>Speed</label><input type="number" min="0" v-model.number="row.req_geschwindigkeit"></div>
-              <div class="field"><label>Kraft</label><input type="number" min="0" v-model.number="row.req_kraft"></div>
-              <div class="field"><label>Technik</label><input type="number" min="0" v-model.number="row.req_technik"></div>
-              <div class="field"><label>Ehrgeiz</label><input type="number" min="0" v-model.number="row.req_ehrgeiz"></div>
-              <div class="field"><label>Sort</label><input type="number" v-model.number="row.sort_order"></div>
-
-              <label class="check-field">
-                <input type="checkbox" v-model="row.active">
-                Aktiv
-              </label>
-            </div>
-
-            <div class="catalog-actions">
-              <button class="btn primary" @click="saveTitleRow(row)">Speichern</button>
-              <button class="btn danger" @click="deleteTitleRow(row)" :disabled="!row.id">Löschen</button>
-            </div>
-          </div>
-        </div>
+        <CatalogRow
+          v-for="row in titles"
+          :key="row._key"
+          :row="row"
+          type="title"
+          @save="saveTitleRow"
+          @delete="deleteTitleRow"
+        />
       </template>
 
       <template v-else>
         <button class="btn primary full" @click="addSpecial">Neue Spezialattacke anlegen</button>
-
-        <div class="catalog-list">
-          <div v-for="row in specials" :key="row._key" class="catalog-row">
-            <div class="catalog-grid special-grid">
-              <div class="field id-field">
-                <label>Nr.</label>
-                <input :value="row.id || 'neu'" disabled>
-              </div>
-
-              <div class="field">
-                <label>Name</label>
-                <input v-model="row.name">
-              </div>
-
-              <div class="field wide">
-                <label>Beschreibung</label>
-                <input v-model="row.description">
-              </div>
-
-              <div class="field"><label>Level</label><input type="number" min="1" v-model.number="row.min_level"></div>
-              <div class="field"><label>Sort</label><input type="number" v-model.number="row.sort_order"></div>
-
-              <label class="check-field">
-                <input type="checkbox" v-model="row.active">
-                Aktiv
-              </label>
-            </div>
-
-            <div class="catalog-actions">
-              <button class="btn primary" @click="saveSpecialRow(row)">Speichern</button>
-              <button class="btn danger" @click="deleteSpecialRow(row)" :disabled="!row.id">Löschen</button>
-            </div>
-          </div>
-        </div>
+        <CatalogRow
+          v-for="row in specials"
+          :key="row._key"
+          :row="row"
+          type="special"
+          @save="saveSpecialRow"
+          @delete="deleteSpecialRow"
+        />
       </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import {
-  deleteSpecial,
-  deleteTitle,
-  loadRpgCatalogs,
-  saveSpecial,
-  saveTitle
-} from '../../services/rpgCatalogService'
+import { defineComponent, h, onMounted, ref } from 'vue'
+import { deleteSpecial, deleteTitle, loadRpgCatalogs, saveSpecial, saveTitle } from '../../services/rpgCatalogService'
 
 const tab = ref('titles')
 const titles = ref([])
@@ -115,15 +51,18 @@ const error = ref('')
 
 onMounted(load)
 
+function defaultReq() {
+  return { req_teamgeist: 0, req_geschwindigkeit: 0, req_kraft: 0, req_technik: 0, req_ehrgeiz: 0 }
+}
+
 async function load() {
   loading.value = true
   message.value = ''
   error.value = ''
-
   try {
     const data = await loadRpgCatalogs()
-    titles.value = data.titles.map(row => ({ ...row, _key: `title-${row.id}` }))
-    specials.value = data.specials.map(row => ({ ...row, _key: `special-${row.id}` }))
+    titles.value = data.titles.map(row => ({ ...defaultReq(), ...row, _key: `title-${row.id}` }))
+    specials.value = data.specials.map(row => ({ ...defaultReq(), ...row, _key: `special-${row.id}` }))
   } catch (e) {
     error.value = e.message || 'Daten konnten nicht geladen werden.'
   } finally {
@@ -132,38 +71,16 @@ async function load() {
 }
 
 function addTitle() {
-  titles.value.unshift({
-    id: null,
-    name: '',
-    description: '',
-    min_level: 1,
-    req_teamgeist: 0,
-    req_geschwindigkeit: 0,
-    req_kraft: 0,
-    req_technik: 0,
-    req_ehrgeiz: 0,
-    sort_order: 100,
-    active: true,
-    _key: `new-title-${Date.now()}`
-  })
+  titles.value.unshift({ id: null, name: '', description: '', min_level: 1, ...defaultReq(), sort_order: 100, active: true, _key: `new-title-${Date.now()}` })
 }
 
 function addSpecial() {
-  specials.value.unshift({
-    id: null,
-    name: '',
-    description: '',
-    min_level: 1,
-    sort_order: 100,
-    active: true,
-    _key: `new-special-${Date.now()}`
-  })
+  specials.value.unshift({ id: null, name: '', description: '', min_level: 1, ...defaultReq(), sort_order: 100, active: true, _key: `new-special-${Date.now()}` })
 }
 
 async function saveTitleRow(row) {
   message.value = ''
   error.value = ''
-
   try {
     await saveTitle(row)
     message.value = `Titel "${row.name}" gespeichert.`
@@ -174,12 +91,7 @@ async function saveTitleRow(row) {
 }
 
 async function deleteTitleRow(row) {
-  if (!row.id) return
-  if (!confirm(`Titel "${row.name}" wirklich löschen?`)) return
-
-  message.value = ''
-  error.value = ''
-
+  if (!row.id || !confirm(`Titel "${row.name}" wirklich löschen?`)) return
   try {
     await deleteTitle(row.id)
     message.value = `Titel "${row.name}" gelöscht.`
@@ -192,7 +104,6 @@ async function deleteTitleRow(row) {
 async function saveSpecialRow(row) {
   message.value = ''
   error.value = ''
-
   try {
     await saveSpecial(row)
     message.value = `Spezialattacke "${row.name}" gespeichert.`
@@ -203,12 +114,7 @@ async function saveSpecialRow(row) {
 }
 
 async function deleteSpecialRow(row) {
-  if (!row.id) return
-  if (!confirm(`Spezialattacke "${row.name}" wirklich löschen?`)) return
-
-  message.value = ''
-  error.value = ''
-
+  if (!row.id || !confirm(`Spezialattacke "${row.name}" wirklich löschen?`)) return
   try {
     await deleteSpecial(row.id)
     message.value = `Spezialattacke "${row.name}" gelöscht.`
@@ -217,96 +123,56 @@ async function deleteSpecialRow(row) {
     error.value = e.message || 'Spezialattacke konnte nicht gelöscht werden.'
   }
 }
+
+const CatalogRow = defineComponent({
+  props: { row: Object, type: String },
+  emits: ['save', 'delete'],
+  setup(props, { emit }) {
+    const field = (label, key, inputType = 'text') => h('div', { class: 'field' }, [
+      h('label', label),
+      h('input', {
+        type: inputType,
+        min: inputType === 'number' ? 0 : undefined,
+        value: props.row[key] ?? '',
+        onInput: e => { props.row[key] = inputType === 'number' ? Number(e.target.value || 0) : e.target.value }
+      })
+    ])
+
+    return () => h('div', { class: 'catalog-row' }, [
+      h('div', { class: 'catalog-grid' }, [
+        h('div', { class: 'field id-field' }, [h('label', 'Nr.'), h('input', { value: props.row.id || 'neu', disabled: true })]),
+        field('Name', 'name'),
+        field('Beschreibung', 'description'),
+        field('Level', 'min_level', 'number'),
+        field('Teamgeist', 'req_teamgeist', 'number'),
+        field('Speed', 'req_geschwindigkeit', 'number'),
+        field('Kraft', 'req_kraft', 'number'),
+        field('Technik', 'req_technik', 'number'),
+        field('Ehrgeiz', 'req_ehrgeiz', 'number'),
+        field('Sort', 'sort_order', 'number'),
+        h('label', { class: 'check-field' }, [
+          h('input', { type: 'checkbox', checked: props.row.active, onChange: e => { props.row.active = e.target.checked } }),
+          ' Aktiv'
+        ])
+      ]),
+      h('div', { class: 'catalog-actions' }, [
+        h('button', { class: 'btn primary', onClick: () => emit('save', props.row) }, 'Speichern'),
+        h('button', { class: 'btn danger', disabled: !props.row.id, onClick: () => emit('delete', props.row) }, 'Löschen')
+      ])
+    ])
+  }
+})
 </script>
 
 <style scoped>
-.catalog-tabs{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.catalog-list{
-  display:grid;
-  gap:12px;
-  margin-top:12px;
-}
-
-.catalog-row{
-  border:3px solid #c5a66f;
-  background:#fffdf6;
-  padding:10px;
-}
-
-.catalog-grid{
-  display:grid;
-  gap:8px;
-  align-items:end;
-}
-
-.title-grid{
-  grid-template-columns:.65fr 1.2fr 2fr repeat(7,.7fr) .65fr;
-}
-
-.special-grid{
-  grid-template-columns:.65fr 1.2fr 2fr .75fr .75fr .65fr;
-}
-
-.field label{
-  display:block;
-  font-size:11px;
-  color:#5f6f86;
-  margin-bottom:3px;
-}
-
-.field input{
-  width:100%;
-  border:3px solid #b99b69;
-  background:#fffdf6;
-  padding:7px;
-  font-weight:800;
-}
-
-.id-field input{
-  opacity:.75;
-  background:#f8edc8;
-}
-
-.check-field{
-  display:flex;
-  gap:6px;
-  align-items:center;
-  font-weight:800;
-  padding-bottom:8px;
-}
-
-.catalog-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  margin-top:10px;
-}
-
-@media(max-width:1100px){
-  .title-grid,
-  .special-grid{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .wide{
-    grid-column:auto;
-  }
-}
-
-@media(max-width:640px){
-  .title-grid,
-  .special-grid{
-    grid-template-columns:1fr;
-  }
-
-  .catalog-actions{
-    flex-direction:column;
-  }
-}
+.catalog-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.catalog-row{border:3px solid #c5a66f;background:#fffdf6;padding:10px;margin-top:12px}
+.catalog-grid{display:grid;gap:8px;align-items:end;grid-template-columns:.65fr 1.2fr 2fr repeat(7,.7fr) .65fr}
+.field label{display:block;font-size:11px;color:#5f6f86;margin-bottom:3px}
+.field input{width:100%;border:3px solid #b99b69;background:#fffdf6;padding:7px;font-weight:800}
+.id-field input{opacity:.75;background:#f8edc8}
+.check-field{display:flex;gap:6px;align-items:center;font-weight:800;padding-bottom:8px}
+.catalog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+@media(max-width:1100px){.catalog-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.catalog-grid{grid-template-columns:1fr}.catalog-actions{flex-direction:column}}
 </style>
