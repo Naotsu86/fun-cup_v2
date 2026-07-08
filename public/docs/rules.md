@@ -3,6 +3,7 @@
 Gespielt wird bis **21 Punkte**.
 
 Steht es beim Erreichen von **21 Punkten** unentschieden, wird so lange weitergespielt, bis eine Mannschaft einen **Vorsprung von zwei Punkten** erreicht hat.
+ 
 
 ---
 
@@ -22,11 +23,10 @@ Landet der Ball außerhalb des Spielfeldes – hierzu zählen auch die Spielfeld
 
 ---
 
-## 4. Netz- und Linienfehler
+## 4. Punkteverteilung
 
-Eine Netzberührung oder das Übertreten der Mittellinie führt zum Verlust des Ballwechsels.
-
-Der Punkt geht an die gegnerische Mannschaft.
+Die Punkte, die man mit der Mannschaft erreicht werden dem einzelnen Spieler zugeschrieben. 
+Beispiel: Wenn das Ergebnis (Team A 21):(17 Team B) ist, bekommt jeder der in Team A spielt 21 Punkte auf sein Konto und jeder aus Team B, 17 Punkte auf sein Konto 
 
 ---
 
