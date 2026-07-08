@@ -30,8 +30,13 @@ export async function loadProfileChoices(profile) {
 
   if (!titles.error && !attacks.error) {
     return {
-      titles: (titles.data || []).filter(title => title.unlocked),
-      attacks: (attacks.data || []).filter(attack => attack.unlocked)
+      titles: (titles.data || [])
+        .filter(title => title.unlocked)
+        .filter(title => !isEmptyTitle(title)),
+
+      attacks: (attacks.data || [])
+        .filter(attack => attack.unlocked)
+        .filter(attack => !isEmptySpecial(attack))
     }
   }
 
@@ -50,18 +55,20 @@ export async function loadProfileChoices(profile) {
   if (fallbackTitles.error) throw fallbackTitles.error
   if (fallbackAttacks.error) throw fallbackAttacks.error
 
-  const unlockedTitles = (fallbackTitles.data || []).filter(title =>
-    level >= Number(title.min_level || 1) &&
-    Number(profile?.stat_teamgeist || 0) >= Number(title.req_teamgeist || 0) &&
-    Number(profile?.stat_geschwindigkeit || 0) >= Number(title.req_geschwindigkeit || 0) &&
-    Number(profile?.stat_kraft || 0) >= Number(title.req_kraft || 0) &&
-    Number(profile?.stat_technik || 0) >= Number(title.req_technik || 0) &&
-    Number(profile?.stat_ehrgeiz || 0) >= Number(title.req_ehrgeiz || 0)
-  )
+  const unlockedTitles = (fallbackTitles.data || [])
+    .filter(title =>
+      level >= Number(title.min_level || 1) &&
+      Number(profile?.stat_teamgeist || 0) >= Number(title.req_teamgeist || 0) &&
+      Number(profile?.stat_geschwindigkeit || 0) >= Number(title.req_geschwindigkeit || 0) &&
+      Number(profile?.stat_kraft || 0) >= Number(title.req_kraft || 0) &&
+      Number(profile?.stat_technik || 0) >= Number(title.req_technik || 0) &&
+      Number(profile?.stat_ehrgeiz || 0) >= Number(title.req_ehrgeiz || 0)
+    )
+    .filter(title => !isEmptyTitle(title))
 
   return {
     titles: unlockedTitles,
-    attacks: fallbackAttacks.data || []
+    attacks: (fallbackAttacks.data || []).filter(attack => !isEmptySpecial(attack))
   }
 }
 
@@ -114,6 +121,24 @@ export async function updateMyAvatar(profileId, avatar) {
     top_item: avatar.top_item,
     bottom_item: avatar.bottom_item || avatar.shorts_item
   })
+}
+
+function isEmptyTitle(title) {
+  const name = normalize(title?.name)
+  const code = normalize(title?.code)
+
+  return code === 'none' || name === 'kein titel' || name === 'none'
+}
+
+function isEmptySpecial(attack) {
+  const name = normalize(attack?.name)
+  const code = normalize(attack?.code)
+
+  return code === 'none' || name === 'keine spezialattacke' || name === 'keine' || name === 'none'
+}
+
+function normalize(value) {
+  return String(value || '').trim().toLowerCase()
 }
 
 function levelFromXp(totalXp) {
