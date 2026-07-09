@@ -1,9 +1,7 @@
 ## 1. Spielmodus
 
-Gespielt wird bis **21 Punkte**.
-
-Steht es beim Erreichen von **21 Punkten** unentschieden, wird so lange weitergespielt, bis eine Mannschaft einen **Vorsprung von zwei Punkten** erreicht hat.
- 
+Ein Satz wird bis **21 Punkte** gespielt. 
+Bei einem Spielstand von **20:20** wird so lange weitergespielt, bis eine Mannschaft mit **zwei Punkten Vorsprung** führt.
 
 ---
 
@@ -27,7 +25,7 @@ Landet der Ball außerhalb des Spielfeldes – hierzu zählen auch die Spielfeld
 
 Die Punkte, die man mit der Mannschaft erreicht werden dem einzelnen Spieler zugeschrieben. 
 Beispiel: Wenn das Ergebnis (Team A 21):(17 Team B) ist, bekommt jeder der in Team A spielt 21 Punkte auf sein Konto und jeder aus Team B, 17 Punkte auf sein Konto 
-Es werden alle Spiele gewertet die über die Seite generiert und dokumentiert werden. 
+Es werden alle Spiele gewertet die am 📍 **Spielort:** [TSG Ailingen e.V.](https://www.google.com/maps/place/TSG+Ailingen+e.V./@47.6856861,9.4821815,234m/data=!3m1!1e3!4m6!3m5!1s0x479b008058f9949d:0x61fef77058e2331b!8m2!3d47.6858146!4d9.4826686!16s%2Fg%2F1xpwhrr4?entry=ttu&g_ep=EgoyMDI2MDcwNi4wIKXMDSoASAFQAw%3D%3D) stattfinden und über die Seite generiert, angekündigt und dokumentiert werden. 
 
 ---
 
