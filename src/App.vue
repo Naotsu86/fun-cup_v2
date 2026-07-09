@@ -56,6 +56,10 @@
       @update-rules="handleRules"
     />
   </main>
+
+  <div class="app-version-badge">
+    v{{ appVersion }}
+  </div>
 </template>
 
 <script setup>
@@ -93,6 +97,7 @@ const settings = ref({})
 const loading = ref(false)
 const error = ref('')
 const message = ref('')
+const appVersion = __APP_VERSION__
 
 let channel = null
 let timer = null
@@ -277,3 +282,21 @@ async function handleRules(rules) {
   })
 }
 </script>
+
+
+<style scoped>
+.app-version-badge{
+  position:fixed;
+  right:8px;
+  bottom:8px;
+  z-index:20;
+  padding:3px 6px;
+  border:2px solid rgba(43,33,21,.45);
+  background:rgba(255,253,246,.82);
+  color:#5f6f86;
+  font-size:10px;
+  font-weight:800;
+  border-radius:0;
+  pointer-events:none;
+}
+</style>
