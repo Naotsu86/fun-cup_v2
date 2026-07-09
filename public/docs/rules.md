@@ -23,10 +23,11 @@ Landet der Ball außerhalb des Spielfeldes – hierzu zählen auch die Spielfeld
 
 ---
 
-## 4. Punkteverteilung
+## 4. Punkteverteilung und Laufzeit
 
 Die Punkte, die man mit der Mannschaft erreicht werden dem einzelnen Spieler zugeschrieben. 
 Beispiel: Wenn das Ergebnis (Team A 21):(17 Team B) ist, bekommt jeder der in Team A spielt 21 Punkte auf sein Konto und jeder aus Team B, 17 Punkte auf sein Konto 
+Es werden alle Spiele gewertet die über die Seite generiert und dokumentiert werden. 
 
 ---
 
