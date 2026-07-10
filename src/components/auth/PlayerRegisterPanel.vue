@@ -13,11 +13,6 @@
       </div>
 
       <div class="field">
-        <label>AKA-Name / Spitzname</label>
-        <input v-model="akaName" type="text" placeholder="z. B. Sandstorm" />
-      </div>
-
-      <div class="field">
         <label>E-Mail</label>
         <input v-model="email" type="email" placeholder="name@example.de" autocomplete="email" />
       </div>
