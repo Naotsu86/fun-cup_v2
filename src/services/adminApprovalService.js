@@ -17,6 +17,20 @@ export async function approvePlayer(playerId) {
   })
 
   if (error) throw error
+
+  const { data: player, error: verifyError } = await supabase
+    .from('players')
+    .select('id, approved, active')
+    .eq('id', playerId)
+    .single()
+
+  if (verifyError) throw verifyError
+
+  if (!player?.approved) {
+    throw new Error('Der Spieler wurde in der Datenbank nicht freigegeben.')
+  }
+
+  return player
 }
 
 export async function blockPlayer(playerId) {

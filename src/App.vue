@@ -47,6 +47,8 @@
       :name-of="nameOf"
       @login="handleLogin"
       @logout="handleLogout"
+      @refresh="loadData"
+      @approve-player="handleApprovePlayer"
       @add-player="handleAddPlayer"
       @update-player="handleUpdatePlayer"
       @delete-player="handleDeletePlayer"
@@ -56,10 +58,6 @@
       @update-rules="handleRules"
     />
   </main>
-
-  <div class="app-version-badge">
-    v{{ appVersion }}
-  </div>
 </template>
 
 <script setup>
@@ -74,6 +72,7 @@ import Admin from './views/Admin.vue'
 import Profile from './views/Profile.vue'
 
 import { getSession, loginWithPassword, logout } from './services/auth'
+import { approvePlayer } from './services/adminApprovalService'
 import { buildRanking, getOpenMatches } from './services/ranking'
 import { createNextMatch } from './services/generator'
 import {
@@ -97,7 +96,6 @@ const settings = ref({})
 const loading = ref(false)
 const error = ref('')
 const message = ref('')
-const appVersion = __APP_VERSION__
 
 let channel = null
 let timer = null
@@ -217,6 +215,14 @@ function matchNumber(m) {
   return matches.value.findIndex(x => x.id === m.id) + 1
 }
 
+async function handleApprovePlayer(playerId) {
+  await run(async () => {
+    await approvePlayer(playerId)
+    message.value = 'Spieler wurde erfolgreich freigegeben.'
+    await loadData()
+  })
+}
+
 async function handleAddPlayer(p) {
   await run(async () => {
     await addPlayer(p)
@@ -282,21 +288,3 @@ async function handleRules(rules) {
   })
 }
 </script>
-
-
-<style scoped>
-.app-version-badge{
-  position:fixed;
-  right:8px;
-  bottom:8px;
-  z-index:20;
-  padding:3px 6px;
-  border:2px solid rgba(43,33,21,.45);
-  background:rgba(255,253,246,.82);
-  color:#5f6f86;
-  font-size:10px;
-  font-weight:800;
-  border-radius:0;
-  pointer-events:none;
-}
-</style>
