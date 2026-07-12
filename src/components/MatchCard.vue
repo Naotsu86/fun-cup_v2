@@ -97,11 +97,34 @@ const versusIcon = `${base}icons/versus.png`
 const draftA = ref(toDraft(props.match.score_a))
 const draftB = ref(toDraft(props.match.score_b))
 
+/*
+ * Wichtig:
+ * Die App lädt im Hintergrund regelmäßig neue Daten.
+ * Solange gerade ungespeicherte Eingaben vorhanden sind, dürfen diese
+ * nicht durch den alten Datenbankwert überschrieben werden.
+ */
+watch(
+  () => props.match.id,
+  () => {
+    syncFromMatch()
+  }
+)
+
 watch(
   () => [props.match.score_a, props.match.score_b],
   ([scoreA, scoreB]) => {
-    draftA.value = toDraft(scoreA)
-    draftB.value = toDraft(scoreB)
+    const incomingA = toDraft(scoreA)
+    const incomingB = toDraft(scoreB)
+
+    // Nur synchronisieren, wenn lokal nichts geändert wurde
+    // oder wenn die Datenbank inzwischen genau den lokalen Wert enthält.
+    if (
+      !hasUnsavedChanges.value ||
+      (draftA.value === incomingA && draftB.value === incomingB)
+    ) {
+      draftA.value = incomingA
+      draftB.value = incomingB
+    }
   }
 )
 
@@ -125,6 +148,11 @@ const savingDisabled = computed(() =>
   draftB.value === ''
 )
 
+function syncFromMatch() {
+  draftA.value = toDraft(props.match.score_a)
+  draftB.value = toDraft(props.match.score_b)
+}
+
 function toDraft(value) {
   return value === null || value === undefined ? '' : String(value)
 }
@@ -135,6 +163,7 @@ function displayScore(value) {
 
 function clean(side) {
   const target = side === 'a' ? draftA : draftB
+
   target.value = String(target.value || '')
     .replace(/\D/g, '')
     .slice(0, 2)
