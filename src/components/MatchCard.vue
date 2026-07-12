@@ -53,21 +53,28 @@
           <small v-if="hasUnsavedChanges" class="score-hint unsaved">
             noch nicht gespeichert
           </small>
-          <small v-else class="score-hint">
-            Ergebnis
+          <small v-else-if="finished" class="score-hint saved">
+            gespeichert
           </small>
         </template>
 
-        <template v-else>
-          <strong>{{ match.score_a ?? '–' }}:{{ match.score_b ?? '–' }}</strong>
-          <small>{{ finished ? 'Beendet' : 'Geplant' }}</small>
-        </template>
+        <strong v-else class="score-display">
+          {{ displayScore(match.score_a) }} : {{ displayScore(match.score_b) }}
+        </strong>
       </div>
 
       <div class="team team-b">
         <b>Team B</b>
         <div v-for="id in match.team_b" :key="id">{{ nameOf(id) }}</div>
       </div>
+    </div>
+
+    <div v-if="benchPlayers.length" class="bench-box">
+      <strong>PAUSE / FANBLOCK</strong>
+      <span v-for="id in benchPlayers" :key="id">{{ nameOf(id) }}</span>
+      <small>
+        Erhält nach Spielende die Punktzahl des Verliererteams und wird im nächsten Spiel bevorzugt aufgestellt.
+      </small>
     </div>
   </article>
 </template>
@@ -76,10 +83,10 @@
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
-  match: Object,
-  number: Number,
-  editable: Boolean,
-  nameOf: Function
+  match: { type: Object, required: true },
+  number: { type: Number, required: true },
+  editable: { type: Boolean, default: false },
+  nameOf: { type: Function, required: true }
 })
 
 const emit = defineEmits(['delete', 'score'])
@@ -89,103 +96,88 @@ const versusIcon = `${base}icons/versus.png`
 
 const draftA = ref(toDraft(props.match.score_a))
 const draftB = ref(toDraft(props.match.score_b))
-const dirty = ref(false)
 
 watch(
   () => [props.match.score_a, props.match.score_b],
   ([scoreA, scoreB]) => {
-    const databaseA = normalizeScore(scoreA)
-    const databaseB = normalizeScore(scoreB)
-    const currentA = normalizeScore(draftA.value)
-    const currentB = normalizeScore(draftB.value)
-
-    if (dirty.value) {
-      if (databaseA === currentA && databaseB === currentB) {
-        dirty.value = false
-        draftA.value = toDraft(scoreA)
-        draftB.value = toDraft(scoreB)
-      }
-      return
-    }
-
     draftA.value = toDraft(scoreA)
     draftB.value = toDraft(scoreB)
   }
 )
 
+const benchPlayers = computed(() => props.match.bench_players || [])
+
 const finished = computed(() =>
   props.match.score_a !== null &&
-  props.match.score_a !== '' &&
   props.match.score_b !== null &&
+  props.match.score_a !== '' &&
   props.match.score_b !== ''
 )
 
-const normalizedA = computed(() => normalizeScore(draftA.value))
-const normalizedB = computed(() => normalizeScore(draftB.value))
-
 const hasUnsavedChanges = computed(() =>
-  normalizedA.value !== normalizeScore(props.match.score_a) ||
-  normalizedB.value !== normalizeScore(props.match.score_b)
+  draftA.value !== toDraft(props.match.score_a) ||
+  draftB.value !== toDraft(props.match.score_b)
 )
 
 const savingDisabled = computed(() =>
   !hasUnsavedChanges.value ||
-  !isValidScore(draftA.value) ||
-  !isValidScore(draftB.value)
+  draftA.value === '' ||
+  draftB.value === ''
 )
 
 function toDraft(value) {
-  return value === null || value === undefined || value === '' ? '' : String(value)
+  return value === null || value === undefined ? '' : String(value)
 }
 
-function normalizeScore(value) {
-  if (value === null || value === undefined || value === '') return null
-  const number = Number(value)
-  return Number.isFinite(number) ? number : null
-}
-
-function isValidScore(value) {
-  if (value === '') return true
-  const number = Number(value)
-  return Number.isInteger(number) && number >= 0 && number <= 99
+function displayScore(value) {
+  return value === null || value === undefined || value === '' ? '–' : value
 }
 
 function clean(side) {
-  if (side === 'a') {
-    draftA.value = String(draftA.value || '').replace(/\D/g, '').slice(0, 2)
-  } else {
-    draftB.value = String(draftB.value || '').replace(/\D/g, '').slice(0, 2)
-  }
-  dirty.value = true
+  const target = side === 'a' ? draftA : draftB
+  target.value = String(target.value || '')
+    .replace(/\D/g, '')
+    .slice(0, 2)
 }
 
 function saveScore() {
   if (savingDisabled.value) return
-  dirty.value = true
+
   emit('score', {
     id: props.match.id,
-    score_a: normalizedA.value,
-    score_b: normalizedB.value
+    score_a: Number(draftA.value),
+    score_b: Number(draftB.value)
   })
 }
 </script>
 
 <style scoped>
-.match.dirty{box-shadow:4px 4px 0 rgba(199,128,24,.25)}
-.match-actions{display:flex;gap:8px;align-items:center}
-.score-editor-simple{display:flex;align-items:center;justify-content:center;gap:8px}
-.score-separator{font-weight:950;font-size:24px;line-height:1}
-.score-input-simple{
-  width:64px;height:48px;padding:0;text-align:center;font-weight:950;font-size:22px;
-  border:3px solid #b99b69;background:#fffdf6;-moz-appearance:textfield;
+.bench-box{
+  margin-top:10px;
+  border:3px solid #b89354;
+  background:#fff4d2;
+  padding:9px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
 }
-.score-input-simple::-webkit-outer-spin-button,
-.score-input-simple::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.score-hint{margin-top:4px}
-.score-hint.unsaved{color:#b45309}
-@media(max-width:760px){
-  .match-head{display:block}
-  .match-actions{display:grid;grid-template-columns:1fr 1fr;margin-top:8px}
-  .score-input-simple{width:68px;height:50px}
+
+.bench-box strong{
+  font-family:var(--font-pixel, 'Silkscreen', monospace);
+  letter-spacing:1px;
+  color:#7c2d12;
+}
+
+.bench-box span{
+  border:2px solid #b89354;
+  background:#fffdf6;
+  padding:3px 7px;
+  font-weight:900;
+}
+
+.bench-box small{
+  width:100%;
+  color:#5f6f86;
 }
 </style>
