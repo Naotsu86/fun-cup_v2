@@ -144,8 +144,17 @@ export function createNextMatch(players, matches, mode) {
     throw new Error('Es wird maximal 4 gegen 4 gespielt.')
   }
 
-  const activePlayers = players.filter(player =>
-    player.active !== false && player.approved !== false
+  const eligiblePlayers = players.filter(player => player.approved !== false)
+
+  const activePlayers = eligiblePlayers.filter(player =>
+    player.active !== false
+  )
+
+  // Snapshot der aktuell abwesenden/inaktiven Spieler.
+  // Nur diese erhalten für dieses neu erzeugte Spiel später
+  // die Punktzahl des Verliererteams.
+  const absentPlayers = eligiblePlayers.filter(player =>
+    player.active === false
   )
 
   if (activePlayers.length < needed) {
@@ -184,6 +193,7 @@ export function createNextMatch(players, matches, mode) {
     team_a: best.teamA.map(player => player.id),
     team_b: best.teamB.map(player => player.id),
     bench_players: benched.map(player => player.id),
+    absent_players: absentPlayers.map(player => player.id),
     score_a: null,
     score_b: null
   }
