@@ -41,6 +41,6 @@
 
 ## 6. Pausen-/Fanmodus oder Inaktiv
 
-- Bei mehr als 8 aktiven Spielern werden die, Spieler die zwar da sind aber nicht spielen können in den Pausen-/Fanmodus versetzt. D.h. sie spielen nicht mit und bekommen die Punktzahl des Verliererteams auf ihr KOnto gutgeschrieben.
+- Bei mehr als 8 aktiven Spielern werden die Spieler die zwar da sind, aber nicht spielen können in den Pausen-/Fanmodus versetzt. D.h. sie spielen nicht mit und bekommen die Punktzahl des Verliererteams auf ihr Konto gutgeschrieben.
 - Bei einer ungeraden Anzahl an Spielern, wäre dieser Modus auch möglich wenn die Mehrzahl der Spieleer damit einverstanden ist.
-- Bei Inaktivität bekommen die Spieler die Punkte der Verlierermannschaft auf ihr Punktekonnto gutgeschriben. Damit sollen Spieler nicht gleich bei ein Mal Abwesenheit direkt aus den Cup auscheiden.
+- Bei Inaktivität bekommen die Spieler (solange sie inaktiv sind) immer die Punkte der Verlierermannschaft auf ihr Punktekonnto gutgeschrieben. Damit sollen Spieler nicht gleich bei ein Mal Abwesenheit direkt aus den Cup auscheiden.
