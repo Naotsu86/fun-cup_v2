@@ -18,33 +18,44 @@ async function loadPlayerCards() {
   return view.data || []
 }
 
+async function loadPointLedger() {
+  const { data, error } = await supabase.rpc('get_point_ledger_data')
+
+  if (error) throw error
+
+  return {
+    awards: data?.awards || [],
+    adjustments: data?.adjustments || []
+  }
+}
+
 export async function loadAll() {
-  const [p, m, s, cards, awards, adjustments] = await Promise.all([
+  const [p, m, s, cards, ledger] = await Promise.all([
     supabase.from('players').select('*').order('created_at', { ascending: true }),
     supabase.from('matches').select('*').order('created_at', { ascending: true }),
     supabase.from('settings').select('*').eq('id', 'main').maybeSingle(),
     loadPlayerCards(),
-    supabase.from('match_point_awards').select('*'),
-    supabase.from('player_point_adjustments').select('*')
+    loadPointLedger()
   ])
 
   if (p.error) throw p.error
   if (m.error) throw m.error
   if (s.error) throw s.error
-  if (awards.error) throw awards.error
-  if (adjustments.error) throw adjustments.error
+
+  const awards = ledger.awards
+  const adjustments = ledger.adjustments
 
   const cardByPlayerId = Object.fromEntries(
     (cards || []).map(row => [row.player_id, row])
   )
 
   const adjustmentByPlayerId = Object.fromEntries(
-    (adjustments.data || []).map(row => [row.player_id, Number(row.points || 0)])
+    (adjustments || []).map(row => [row.player_id, Number(row.points || 0)])
   )
 
   const awardsByMatchId = {}
 
-  for (const award of awards.data || []) {
+  for (const award of awards || []) {
     if (!awardsByMatchId[award.match_id]) awardsByMatchId[award.match_id] = []
 
     awardsByMatchId[award.match_id].push({
