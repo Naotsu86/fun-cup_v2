@@ -65,11 +65,51 @@
           </div>
         </div>
 
-        <StatControlRow icon="teamgeist" label="TEAMGEIST" color="red" :value="statValue('teamgeist')" :pending="statDraft.teamgeist" :can-add="availableAfterDraft > 0" :can-remove="statDraft.teamgeist > 0" @add="addPoint('teamgeist')" @remove="removePoint('teamgeist')" />
-        <StatControlRow icon="speed" label="SPEED" color="yellow" :value="statValue('geschwindigkeit')" :pending="statDraft.geschwindigkeit" :can-add="availableAfterDraft > 0" :can-remove="statDraft.geschwindigkeit > 0" @add="addPoint('geschwindigkeit')" @remove="removePoint('geschwindigkeit')" />
-        <StatControlRow icon="kraft" label="KRAFT" color="orange" :value="statValue('kraft')" :pending="statDraft.kraft" :can-add="availableAfterDraft > 0" :can-remove="statDraft.kraft > 0" @add="addPoint('kraft')" @remove="removePoint('kraft')" />
-        <StatControlRow icon="technik" label="TECHNIK" color="blue" :value="statValue('technik')" :pending="statDraft.technik" :can-add="availableAfterDraft > 0" :can-remove="statDraft.technik > 0" @add="addPoint('technik')" @remove="removePoint('technik')" />
-        <StatControlRow icon="ehrgeiz" label="EHRGEIZ" color="red" :value="statValue('ehrgeiz')" :pending="statDraft.ehrgeiz" :can-add="availableAfterDraft > 0" :can-remove="statDraft.ehrgeiz > 0" @add="addPoint('ehrgeiz')" @remove="removePoint('ehrgeiz')" />
+        <StatControlRow
+          icon="teamgeist"
+          label="TEAMGEIST"
+          color="red"
+          :value="statValue('teamgeist')"
+          :pending="statDraft.teamgeist"
+          :max-pending="maxPendingFor('teamgeist')"
+          @update:pending="setPending('teamgeist', $event)"
+        />
+        <StatControlRow
+          icon="speed"
+          label="SPEED"
+          color="yellow"
+          :value="statValue('geschwindigkeit')"
+          :pending="statDraft.geschwindigkeit"
+          :max-pending="maxPendingFor('geschwindigkeit')"
+          @update:pending="setPending('geschwindigkeit', $event)"
+        />
+        <StatControlRow
+          icon="kraft"
+          label="KRAFT"
+          color="orange"
+          :value="statValue('kraft')"
+          :pending="statDraft.kraft"
+          :max-pending="maxPendingFor('kraft')"
+          @update:pending="setPending('kraft', $event)"
+        />
+        <StatControlRow
+          icon="technik"
+          label="TECHNIK"
+          color="blue"
+          :value="statValue('technik')"
+          :pending="statDraft.technik"
+          :max-pending="maxPendingFor('technik')"
+          @update:pending="setPending('technik', $event)"
+        />
+        <StatControlRow
+          icon="ehrgeiz"
+          label="EHRGEIZ"
+          color="red"
+          :value="statValue('ehrgeiz')"
+          :pending="statDraft.ehrgeiz"
+          :max-pending="maxPendingFor('ehrgeiz')"
+          @update:pending="setPending('ehrgeiz', $event)"
+        />
       </div>
 
       <button v-if="hasChanges" class="btn primary full rpg-save-button" @click="save" :disabled="saving || availableAfterDraft < 0">
@@ -209,14 +249,21 @@ function statValue(key) {
   return Number(props.profile[map[key]] || 0)
 }
 
-function addPoint(key) {
-  if (availableAfterDraft.value <= 0) return
-  statDraft[key] += 1
+function maxPendingFor(key) {
+  return Math.max(
+    0,
+    Number(statDraft[key] || 0) + Number(availableAfterDraft.value || 0)
+  )
 }
 
-function removePoint(key) {
-  if (statDraft[key] <= 0) return
-  statDraft[key] -= 1
+function setPending(key, rawValue) {
+  const parsed = Math.floor(Number(rawValue || 0))
+  const safeValue = Number.isFinite(parsed) ? parsed : 0
+
+  statDraft[key] = Math.max(
+    0,
+    Math.min(safeValue, maxPendingFor(key))
+  )
 }
 
 function save() {
