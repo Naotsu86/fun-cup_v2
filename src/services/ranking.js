@@ -16,6 +16,10 @@ export function buildRanking(players, matches) {
     players.map(player => [
       player.id,
       {
+        // Sämtliche Profilwerte übernehmen. Dadurch bleiben Titel,
+        // Spezialattacke, Level, Stats und Avatar-Daten auch in der
+        // Übersicht und Rangliste erhalten.
+        ...player,
         id: player.id,
         name: player.name,
         active: player.active !== false,
@@ -25,12 +29,7 @@ export function buildRanking(players, matches) {
         diff: 0,
         avg: 0,
         pause_points: 0,
-        absence_points: 0,
-        body_color: player.body_color,
-        belly_color: player.belly_color,
-        head_item: player.head_item,
-        shorts_item: player.shorts_item,
-        accessory_item: player.accessory_item
+        absence_points: Number(player.absence_points || 0)
       }
     ])
   )
@@ -70,16 +69,6 @@ export function buildRanking(players, matches) {
 
       rows[id].points += loserPoints
       rows[id].pause_points += loserPoints
-    }
-
-    // Spieler, die beim Erzeugen dieses Spiels auf "Inaktiv" standen,
-    // erhalten ebenfalls die Punktzahl des Verliererteams.
-    // Die Abwesenheit zählt nicht als gespieltes Spiel und nicht als Sieg.
-    for (const id of match.absent_players || []) {
-      if (!rows[id]) continue
-
-      rows[id].points += loserPoints
-      rows[id].absence_points += loserPoints
     }
   }
 

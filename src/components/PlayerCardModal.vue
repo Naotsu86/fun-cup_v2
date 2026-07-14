@@ -15,6 +15,12 @@
         <div class="player-card-info">
           <div class="card-label">TITLE</div>
           <div class="player-card-title">{{ card.selected_title_name || 'Kein Titel' }}</div>
+          <div
+            v-if="card.selected_title_description"
+            class="player-card-title-description"
+          >
+            {{ card.selected_title_description }}
+          </div>
 
           <div class="card-label">NAME</div>
           <div class="player-card-name">{{ card.name || card.real_name || '-' }}</div>
@@ -236,6 +242,16 @@ function levelFromXp(totalXp) {
   margin-bottom:8px;
   letter-spacing:2px;
   text-transform:uppercase;
+}
+
+.player-card-title-description{
+  margin:-2px 0 12px;
+  padding:8px 10px;
+  border-left:4px solid #b89354;
+  background:#fffdf6;
+  color:#5f4a2b;
+  font-size:14px;
+  line-height:1.4;
 }
 
 .player-card-name{
