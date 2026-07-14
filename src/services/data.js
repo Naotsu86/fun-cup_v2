@@ -19,18 +19,47 @@ async function loadPlayerCards() {
 }
 
 export async function loadAll() {
-  const [p, m, s, cards] = await Promise.all([
+  const [p, m, s, cards, awards, adjustments] = await Promise.all([
     supabase.from('players').select('*').order('created_at', { ascending: true }),
     supabase.from('matches').select('*').order('created_at', { ascending: true }),
     supabase.from('settings').select('*').eq('id', 'main').maybeSingle(),
-    loadPlayerCards()
+    loadPlayerCards(),
+    supabase.from('match_point_awards').select('*'),
+    supabase.from('player_point_adjustments').select('*')
   ])
 
   if (p.error) throw p.error
   if (m.error) throw m.error
   if (s.error) throw s.error
+  if (awards.error) throw awards.error
+  if (adjustments.error) throw adjustments.error
 
-  const cardByPlayerId = Object.fromEntries((cards || []).map(row => [row.player_id, row]))
+  const cardByPlayerId = Object.fromEntries(
+    (cards || []).map(row => [row.player_id, row])
+  )
+
+  const adjustmentByPlayerId = Object.fromEntries(
+    (adjustments.data || []).map(row => [row.player_id, Number(row.points || 0)])
+  )
+
+  const awardsByMatchId = {}
+
+  for (const award of awards.data || []) {
+    if (!awardsByMatchId[award.match_id]) awardsByMatchId[award.match_id] = []
+
+    awardsByMatchId[award.match_id].push({
+      ...award,
+      points: Number(award.points || 0),
+      games: Number(award.games || 0),
+      wins: Number(award.wins || 0),
+      point_diff: Number(award.point_diff || 0)
+    })
+  }
+
+  const matches = (m.data || []).map(match => ({
+    ...match,
+    point_awards: awardsByMatchId[match.id] || []
+  }))
 
   const players = (p.data || []).map(player => {
     const card = cardByPlayerId[player.id] || {}
@@ -46,6 +75,8 @@ export async function loadAll() {
       approved: player.approved,
       strength: player.strength,
       form: player.form,
+
+      point_adjustment: adjustmentByPlayerId[player.id] || 0,
 
       xp_total: Number(card.xp_total || 0),
       calculated_level: Number(card.calculated_level || 1),
@@ -73,13 +104,28 @@ export async function loadAll() {
       body_color: card.body_color || player.body_color || 'black',
       head_item: card.head_item || player.head_item || 'none',
       top_item: card.top_item || player.top_item || 'none',
-      bottom_item: card.bottom_item || card.shorts_item || player.shorts_item || 'none',
-      shorts_item: card.bottom_item || card.shorts_item || player.shorts_item || 'none',
-      accessory_item: card.accessory_item || player.accessory_item || 'none'
+      bottom_item:
+        card.bottom_item ||
+        card.shorts_item ||
+        player.shorts_item ||
+        'none',
+      shorts_item:
+        card.bottom_item ||
+        card.shorts_item ||
+        player.shorts_item ||
+        'none',
+      accessory_item:
+        card.accessory_item ||
+        player.accessory_item ||
+        'none'
     }
   })
 
-  return { players, matches: m.data || [], settings: s.data?.value || {} }
+  return {
+    players,
+    matches,
+    settings: s.data?.value || {}
+  }
 }
 
 export async function addPlayer(row) {
@@ -89,6 +135,7 @@ export async function addPlayer(row) {
     form: 0,
     active: true
   })
+
   if (error) throw error
 }
 
@@ -108,27 +155,66 @@ export async function insertMatch(row) {
 }
 
 export async function updateMatch(id, patch) {
+  const changesScore =
+    Object.prototype.hasOwnProperty.call(patch, 'score_a') ||
+    Object.prototype.hasOwnProperty.call(patch, 'score_b')
+
+  if (changesScore) {
+    const { data: current, error: readError } = await supabase
+      .from('matches')
+      .select('score_a, score_b')
+      .eq('id', id)
+      .single()
+
+    if (readError) throw readError
+
+    const scoreA = Object.prototype.hasOwnProperty.call(patch, 'score_a')
+      ? patch.score_a
+      : current.score_a
+
+    const scoreB = Object.prototype.hasOwnProperty.call(patch, 'score_b')
+      ? patch.score_b
+      : current.score_b
+
+    const { error } = await supabase.rpc('save_match_score', {
+      target_match_id: id,
+      new_score_a: Number(scoreA),
+      new_score_b: Number(scoreB)
+    })
+
+    if (error) throw error
+    return
+  }
+
   const { error } = await supabase.from('matches').update(patch).eq('id', id)
   if (error) throw error
 }
 
 export async function deleteMatch(id) {
-  const { error } = await supabase.from('matches').delete().eq('id', id)
+  const { error } = await supabase.rpc('delete_match_with_points', {
+    target_match_id: id
+  })
+
   if (error) throw error
 }
 
 export async function updateSettings(value) {
-  const { error } = await supabase.from('settings').upsert({ id: 'main', value })
+  const { error } = await supabase
+    .from('settings')
+    .upsert({ id: 'main', value })
+
   if (error) throw error
 }
 
 export async function updateForms(players, matches) {
   const form = calculateForm(players, matches)
 
-  await Promise.all(players.map(p =>
-    supabase
-      .from('players')
-      .update({ form: form[p.id] || 0 })
-      .eq('id', p.id)
-  ))
+  await Promise.all(
+    players.map(player =>
+      supabase
+        .from('players')
+        .update({ form: form[player.id] || 0 })
+        .eq('id', player.id)
+    )
+  )
 }
