@@ -24,7 +24,7 @@
         <div class="podium-title">{{ row.selected_title_name || 'Kein Titel' }}</div>
         <div class="podium-name">{{ row.name }}</div>
         <div class="podium-points">{{ row.points }} Punkte</div>
-        <div class="podium-meta">{{ row.games }} Spiele · {{ row.wins }} Siege</div>
+        <div class="podium-meta">{{ row.games }} Spiele · {{ row.wins }} Siege · Ø {{ formatAverage(row.avg) }}</div>
       </button>
 
       <img class="place-badge" :src="badge(index)" :alt="`${index + 1}. Platz`" />
@@ -39,6 +39,11 @@ defineProps({ topRows: Array })
 defineEmits(['select-player'])
 
 const base = import.meta.env.BASE_URL
+
+function formatAverage(value) {
+  const number = Number(value || 0)
+  return Number.isInteger(number) ? String(number) : number.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')
+}
 
 function badge(index) {
   if (index === 0) return `${base}badges/first.png`
