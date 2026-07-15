@@ -20,7 +20,7 @@ export async function getMyProfile() {
   if (!profileResult.data) return null
 
   if (sunGamesResult.error) {
-    console.warn('Sonnenspiele konnten nicht geladen werden.', sunGamesResult.error)
+    console.warn('Sonnenspiele konnten nicht geladen werden:', sunGamesResult.error.message)
   }
 
   return {

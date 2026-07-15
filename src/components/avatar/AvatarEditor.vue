@@ -65,6 +65,8 @@
           </div>
         </div>
 
+        <SunGamesRow :value="sunGamesCount" />
+
         <StatControlRow
           icon="teamgeist"
           label="TEAMGEIST"

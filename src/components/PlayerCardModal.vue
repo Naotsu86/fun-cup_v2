@@ -15,12 +15,6 @@
         <div class="player-card-info">
           <div class="card-label">TITLE</div>
           <div class="player-card-title">{{ card.selected_title_name || 'Kein Titel' }}</div>
-          <div
-            v-if="card.selected_title_description"
-            class="player-card-title-description"
-          >
-            {{ card.selected_title_description }}
-          </div>
 
           <div class="card-label">NAME</div>
           <div class="player-card-name">{{ card.name || card.real_name || '-' }}</div>
@@ -50,6 +44,7 @@
       <p v-if="loadError" class="card-error">{{ loadError }}</p>
 
       <div class="stat-list">
+        <SunGamesRow :value="Number(card.sun_games_count || 0)" />
         <PlayerCardStatRow icon="teamgeist" label="TEAMGEIST" color="red" :value="Number(card.stat_teamgeist || 0)" />
         <PlayerCardStatRow icon="speed" label="SPEED" color="yellow" :value="Number(card.stat_geschwindigkeit || 0)" />
         <PlayerCardStatRow icon="kraft" label="KRAFT" color="orange" :value="Number(card.stat_kraft || 0)" />
@@ -64,6 +59,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import AvatarPreview from './avatar/AvatarPreview.vue'
 import PlayerCardStatRow from './PlayerCardStatRow.vue'
+import SunGamesRow from './avatar/SunGamesRow.vue'
 import { supabase } from '../api/supabase'
 
 const props = defineProps({
@@ -108,6 +104,7 @@ function normalizeCard(row) {
     stat_kraft: Number(row?.stat_kraft || 0),
     stat_technik: Number(row?.stat_technik || 0),
     stat_ehrgeiz: Number(row?.stat_ehrgeiz || 0),
+    sun_games_count: Number(row?.sun_games_count || 0),
     body_color: row?.body_color || row?.avatar_body || 'black',
     head_item: row?.head_item || 'none',
     top_item: row?.top_item || 'none',
@@ -125,20 +122,25 @@ async function loadFreshCard() {
   loadError.value = ''
 
   try {
-    const { data, error } = await supabase.rpc('get_player_cards')
-
-    if (error) throw error
-
-    const fresh = (data || []).find(row => row.player_id === playerId)
-
-    if (fresh) {
-      card.value = normalizeCard({
-        ...props.player,
-        ...fresh,
-        id: props.player.id,
-        name: props.player.name || fresh.real_name
+    const [cardsResult, sunGamesResult] = await Promise.all([
+      supabase.rpc('get_player_cards'),
+      supabase.rpc('get_player_sun_games_count', {
+        target_player_id: playerId
       })
-    }
+    ])
+
+    if (cardsResult.error) throw cardsResult.error
+    if (sunGamesResult.error) throw sunGamesResult.error
+
+    const fresh = (cardsResult.data || []).find(row => row.player_id === playerId)
+
+    card.value = normalizeCard({
+      ...props.player,
+      ...(fresh || {}),
+      sun_games_count: Number(sunGamesResult.data || 0),
+      id: props.player.id,
+      name: props.player.name || fresh?.real_name
+    })
   } catch (error) {
     loadError.value = error.message || 'Spielerkarte konnte nicht geladen werden.'
   } finally {
@@ -242,16 +244,6 @@ function levelFromXp(totalXp) {
   margin-bottom:8px;
   letter-spacing:2px;
   text-transform:uppercase;
-}
-
-.player-card-title-description{
-  margin:-2px 0 12px;
-  padding:8px 10px;
-  border-left:4px solid #b89354;
-  background:#fffdf6;
-  color:#5f4a2b;
-  font-size:14px;
-  line-height:1.4;
 }
 
 .player-card-name{
