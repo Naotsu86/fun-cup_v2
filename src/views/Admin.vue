@@ -17,10 +17,14 @@
           <div class="card pixel-card menu-window"><h2>🕘 Wartende Spieler</h2><div class="menu-body"><button class="btn full" @click="$emit('refresh')">Aktualisieren</button><p v-if="pendingPlayers.length === 0" class="muted">Aktuell wartet kein Spieler auf Freigabe.</p><div class="pending-list"><div v-for="p in pendingPlayers" :key="p.id" class="pending-row"><div><strong>{{ p.name }}</strong><div class="muted small">{{ p.email || '-' }}</div><div class="muted small">Status: wartet auf Freigabe</div></div><button class="btn primary" :disabled="approvingId === p.id" @click="approve(p.id)">{{ approvingId === p.id ? 'WIRD FREIGEGEBEN...' : 'FREIGEBEN' }}</button></div></div><p v-if="message" class="hint">{{ message }}</p></div></div>
           <div class="card pixel-card menu-window"><h2>Spieler manuell anlegen</h2><div class="menu-body"><p class="muted">Normalerweise registrieren sich Spieler selbst. Hier kannst du bei Bedarf trotzdem Spieler ohne Login anlegen.</p><div class="row"><div class="field"><label>Name</label><input v-model="newName" placeholder="z. B. Alex"></div><div class="field"><label>Stärke 1-12</label><select v-model.number="newStrength"><option v-for="n in 12" :key="n" :value="n">{{ n }}</option></select></div></div><button class="btn primary full" @click="add">Spieler hinzufügen</button></div></div>
           <div class="card pixel-card menu-window"><h2>Spielerliste</h2><div class="menu-body"><p v-if="players.length===0" class="muted">Noch keine Spieler angelegt.</p><div class="admin-player-list"><div v-for="p in players" :key="p.id" class="player playerrow"><div><label>Name</label><input :value="p.name" @change="$emit('update-player', p.id, { name: $event.target.value })"><div class="muted small" v-if="p.email">{{ p.email }}</div><div class="muted small">Status: {{ p.approved ? 'Freigegeben' : 'Wartet' }}</div></div><div><label>Stärke</label><select :value="p.strength" @change="$emit('update-player', p.id, { strength: Number($event.target.value) })"><option v-for="n in 12" :key="n" :value="n">{{ n }}</option></select><div class="muted small">Form: {{ Number(p.form||0).toFixed(2) }}</div></div><div class="player-actions"><button class="btn" :class="{ inactive:p.active===false }" @click="$emit('update-player', p.id, { active: p.active === false })">{{ p.active===false?'Inaktiv':'Aktiv' }}</button><button v-if="!p.approved" class="btn primary" :disabled="approvingId === p.id" @click="approve(p.id)">{{ approvingId === p.id ? 'WIRD FREIGEGEBEN...' : 'FREIGEBEN' }}</button><button class="btn danger" @click="$emit('delete-player', p.id)">Löschen</button></div></div></div></div></div>
+          <AdminStatPointGrant
+            :players="players"
+            @updated="$emit('refresh')"
+          />
         </template>
         <template v-if="activePanel === 'games'">
           <div class="card pixel-card menu-window"><h2>Nächstes Spiel</h2><div class="menu-body"><p class="muted">Immer nur ein neues Spiel. So werden aktive Spieler und Turnierform berücksichtigt.</p><div class="field"><label>Modus</label><select v-model="mode"><option value="2v2">2 gegen 2</option><option value="2v3">2 gegen 3</option><option value="3v3">3 gegen 3</option><option value="3v4">3 gegen 4</option><option value="4v4">4 gegen 4</option></select></div><button class="btn primary full" @click="$emit('create-match', mode)">Spiel erzeugen</button><p v-if="message" class="hint">{{ message }}</p></div></div>
-          <div class="card pixel-card menu-window"><h2>Ergebnisse eintragen</h2><div class="menu-body"><p v-if="matches.length===0" class="muted">Noch keine Spiele angelegt.</p><MatchCard v-for="m in sortedMatches" :key="m.id" :match="m" :number="matchNumber(m)" :editable="true" :name-of="nameOf" @delete="$emit('delete-match',$event)" @score="$emit('score',$event)" /></div></div>
+          <div class="card pixel-card menu-window"><h2>Ergebnisse eintragen</h2><div class="menu-body"><p v-if="matches.length===0" class="muted">Noch keine Spiele angelegt.</p><MatchCard v-for="m in matches" :key="m.id" :match="m" :number="matchNumber(m)" :editable="true" :name-of="nameOf" @delete="$emit('delete-match',$event)" @score="$emit('score',$event)" /></div></div>
         </template>
         <AdminRpgCatalogManager v-if="activePanel === 'catalog'" />
       </template>
@@ -32,43 +36,11 @@ import { computed, ref } from 'vue'
 import AdminLogin from '../components/AdminLogin.vue'
 import MatchCard from '../components/MatchCard.vue'
 import AdminRpgCatalogManager from '../components/admin/AdminRpgCatalogManager.vue'
+import AdminStatPointGrant from '../components/admin/AdminStatPointGrant.vue'
 const props = defineProps({ adminUnlocked:Boolean, userEmail:String, players:{ type:Array, default:() => [] }, matches:{ type:Array, default:() => [] }, rules:String, message:String, matchNumber:Function, nameOf:Function })
 const emit = defineEmits(['login','logout','refresh','approve-player','add-player','update-player','delete-player','create-match','delete-match','score','update-rules'])
 const activePanel = ref('menu'), newName = ref(''), newStrength = ref(6), mode = ref('4v4'), approvingId = ref(null)
-const pendingPlayers = computed(() => (props.players || []).filter(
-  p => p.approved === false || p.approved === null || p.approved === undefined
-))
-
-const sortedMatches = computed(() =>
-  [...(props.matches || [])].sort((a, b) => {
-    const openA = !isFinished(a)
-    const openB = !isFinished(b)
-
-    // Offene Spiele stehen beim Eintragen der Ergebnisse immer oben.
-    if (openA !== openB) return openA ? -1 : 1
-
-    // Innerhalb der Gruppe steht das zuletzt erzeugte Spiel oben.
-    return matchTime(b) - matchTime(a)
-  })
-)
-
-function isFinished(match) {
-  return (
-    match.score_a !== null &&
-    match.score_b !== null &&
-    match.score_a !== '' &&
-    match.score_b !== ''
-  )
-}
-
-function matchTime(match) {
-  const value = match.created_at || match.createdAt || ''
-  const parsed = Date.parse(value)
-
-  if (!Number.isNaN(parsed)) return parsed
-
-  return (props.matches || []).findIndex(item => item.id === match.id)
-}
+const pendingPlayers = computed(() => (props.players || []).filter(p => p.approved === false || p.approved === null || p.approved === undefined))
 function add(){ const name = newName.value.trim(); if(!name) return; emit('add-player',{ name, strength:Number(newStrength.value) }); newName.value=''; newStrength.value=6 }
 
 function approve(playerId) {
