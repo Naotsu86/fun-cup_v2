@@ -127,6 +127,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import AvatarPreview from './AvatarPreview.vue'
 import AvatarPickerRow from './AvatarPickerRow.vue'
 import StatControlRow from './StatControlRow.vue'
+import SunGamesRow from './SunGamesRow.vue'
 import { avatarOptions, getNextOption, getOptionLabel } from '../../services/avatarOptions'
 import { loadProfileChoices } from '../../services/playerProfileService'
 
@@ -158,6 +159,7 @@ onMounted(loadChoices)
 const playerName = computed(() => props.profile.players?.name || props.profile.display_name || '')
 const unlockedItems = computed(() => props.profile.unlocked_items || [])
 const xpTotal = computed(() => Number(props.profile.xp_total || 0))
+const sunGamesCount = computed(() => Number(props.profile.sun_games_count || 0))
 const profileLevel = computed(() => Number(props.profile.level || levelFromXp(xpTotal.value)))
 const currentLevelXp = computed(() => xpForLevel(profileLevel.value))
 const nextLevelXp = computed(() => xpForLevel(profileLevel.value + 1))
