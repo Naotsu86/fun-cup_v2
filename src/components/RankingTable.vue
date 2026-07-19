@@ -26,7 +26,7 @@
         <div class="ranking-name-main">{{ r.name }}</div>
         <div class="ranking-points-main">{{ r.points }} Punkte</div>
         <div class="ranking-meta">
-           {{ r.games }} Spiele · {{ formatWinRate(r.win_rate) }} % Siege
+           {{ r.games }} Spiele · {{ formatWinRate(r.win_rate) }} % Siege · Ø {{ formatAverage(r.average_points) }} Punkte
           <RankTrend :change="r.rank_change" />
         </div>
       </button>
@@ -59,6 +59,11 @@ defineEmits(['select-player'])
 const rankBadgeIcon = `${import.meta.env.BASE_URL}icons/rank-badge-empty.svg`
 
 function formatWinRate(value) {
+  const number = Number(value || 0)
+  return Number.isInteger(number) ? String(number) : number.toFixed(1)
+}
+
+function formatAverage(value) {
   const number = Number(value || 0)
   return Number.isInteger(number) ? String(number) : number.toFixed(1)
 }

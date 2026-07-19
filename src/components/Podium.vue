@@ -25,7 +25,7 @@
         <div class="podium-name">{{ row.name }}</div>
         <div class="podium-points">{{ row.points }} Punkte</div>
         <div class="podium-meta">
-        {{ row.games }} Spiele · {{ formatWinRate(row.win_rate) }} % Siege
+        {{ row.games }} Spiele · {{ formatWinRate(row.win_rate) }} % Siege · Ø {{ formatAverage(row.average_points) }} Punkte
           <RankTrend :change="row.rank_change" />
         </div>
       </button>
@@ -45,6 +45,11 @@ defineEmits(['select-player'])
 const base = import.meta.env.BASE_URL
 
 function formatWinRate(value) {
+  const number = Number(value || 0)
+  return Number.isInteger(number) ? String(number) : number.toFixed(1)
+}
+
+function formatAverage(value) {
   const number = Number(value || 0)
   return Number.isInteger(number) ? String(number) : number.toFixed(1)
 }

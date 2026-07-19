@@ -83,6 +83,17 @@ export function buildRanking(players) {
       stat_ehrgeiz: Number(player.stat_ehrgeiz || 0)
     }
   })
+  const maxGames = rows.reduce(
+  (maximum, row) => Math.max(maximum, row.games),
+  0
+)
+
+rows.forEach(row => {
+  row.average_points = maxGames
+    ? Number((row.points / maxGames).toFixed(1))
+    : 0
+})
+
   const currentRows = [...rows].sort(rankingSort)
 
   const previousRows = rows
