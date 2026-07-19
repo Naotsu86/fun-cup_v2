@@ -82,11 +82,7 @@ export function buildRanking(players) {
       stat_technik: Number(player.stat_technik || 0),
       stat_ehrgeiz: Number(player.stat_ehrgeiz || 0)
     }
-  }).map(r=>({...r, average_points:maxGames?Number((r.points/maxGames).toFixed(1)):0}))
-
-
-  const maxGames = rows.reduce((m,r)=>Math.max(m,r.games),0)
-
+  })
   const currentRows = [...rows].sort(rankingSort)
 
   const previousRows = rows
