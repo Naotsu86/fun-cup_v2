@@ -25,7 +25,10 @@
         </div>
         <div class="ranking-name-main">{{ r.name }}</div>
         <div class="ranking-points-main">{{ r.points }} Punkte</div>
-        <div class="ranking-meta">{{ r.games }} Spiele · {{ r.wins }} Siege · Ø {{ r.avg }}</div>
+        <div class="ranking-meta">
+          {{ r.games }} Spiele · {{ formatWinRate(r.win_rate) }} % Siege
+          <RankTrend :change="r.rank_change" />
+        </div>
       </button>
 
       <div class="dynamic-rank-badge" :aria-label="`${startAt + i}. Platz`">
@@ -38,6 +41,7 @@
 
 <script setup>
 import AvatarPreview from './avatar/AvatarPreview.vue'
+import RankTrend from './RankTrend.vue'
 
 defineProps({
   rows: {
@@ -53,6 +57,11 @@ defineProps({
 defineEmits(['select-player'])
 
 const rankBadgeIcon = `${import.meta.env.BASE_URL}icons/rank-badge-empty.svg`
+
+function formatWinRate(value) {
+  const number = Number(value || 0)
+  return Number.isInteger(number) ? String(number) : number.toFixed(1)
+}
 </script>
 
 <style scoped>
@@ -75,6 +84,13 @@ const rankBadgeIcon = `${import.meta.env.BASE_URL}icons/rank-badge-empty.svg`
 
 .ranking-content-button{
   width:100%;
+}
+
+.ranking-meta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
 }
 
 .ranking-title-small{

@@ -60,6 +60,12 @@ export async function loadAll() {
       score_pause_points: Number(score.pause_points || 0),
       score_absence_points: Number(score.absence_points || 0),
 
+      previous_score_total: Number(score.previous_total_points || 0),
+      previous_score_games: Number(score.previous_games || 0),
+      previous_score_wins: Number(score.previous_wins || 0),
+      previous_score_diff: Number(score.previous_point_diff || 0),
+      has_rank_history: score.has_rank_history === true,
+
       xp_total: Number(card.xp_total || score.total_points || 0),
       calculated_level: Number(card.calculated_level || 1),
       current_level_xp: Number(card.current_level_xp || 0),

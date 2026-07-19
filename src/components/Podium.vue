@@ -24,7 +24,10 @@
         <div class="podium-title">{{ row.selected_title_name || 'Kein Titel' }}</div>
         <div class="podium-name">{{ row.name }}</div>
         <div class="podium-points">{{ row.points }} Punkte</div>
-        <div class="podium-meta">{{ row.games }} Spiele · {{ row.wins }} Siege · Ø {{ formatAverage(row.avg) }}</div>
+        <div class="podium-meta">
+          {{ row.games }} Spiele · {{ formatWinRate(row.win_rate) }} % Siege
+          <RankTrend :change="row.rank_change" />
+        </div>
       </button>
 
       <img class="place-badge" :src="badge(index)" :alt="`${index + 1}. Platz`" />
@@ -34,15 +37,16 @@
 
 <script setup>
 import AvatarPreview from './avatar/AvatarPreview.vue'
+import RankTrend from './RankTrend.vue'
 
 defineProps({ topRows: Array })
 defineEmits(['select-player'])
 
 const base = import.meta.env.BASE_URL
 
-function formatAverage(value) {
+function formatWinRate(value) {
   const number = Number(value || 0)
-  return Number.isInteger(number) ? String(number) : number.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')
+  return Number.isInteger(number) ? String(number) : number.toFixed(1)
 }
 
 function badge(index) {
@@ -79,6 +83,13 @@ function badge(index) {
   font:inherit;
   color:inherit;
   cursor:pointer;
+}
+
+.podium-meta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
 }
 
 .podium-title{
