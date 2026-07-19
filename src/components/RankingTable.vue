@@ -23,11 +23,11 @@
         <div class="ranking-title-small">
           {{ r.selected_title_name || 'Kein Titel' }}
         </div>
-        <div class="ranking-name-main">{{ r.name }}</div>
+        <div class="ranking-name-main">{{ r.name }} <RankTrend :change="r.rank_change" /></div>
         <div class="ranking-points-main">{{ r.points }} Punkte</div>
         <div class="ranking-meta">
            {{ r.games }} Spiele · {{ formatWinRate(r.win_rate) }} % Siege · Ø {{ formatAverage(r.average_points) }} Punkte
-          <RankTrend :change="r.rank_change" />
+          
         </div>
       </button>
 
