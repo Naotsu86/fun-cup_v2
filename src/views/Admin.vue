@@ -24,7 +24,7 @@
         </template>
         <template v-if="activePanel === 'games'">
           <div class="card pixel-card menu-window"><h2>Nächstes Spiel</h2><div class="menu-body"><p class="muted">Immer nur ein neues Spiel. So werden aktive Spieler und Turnierform berücksichtigt.</p><div class="field"><label>Modus</label><select v-model="mode"><option value="2v2">2 gegen 2</option><option value="2v3">2 gegen 3</option><option value="3v3">3 gegen 3</option><option value="3v4">3 gegen 4</option><option value="4v4">4 gegen 4</option></select></div><button class="btn primary full" @click="$emit('create-match', mode)">Spiel erzeugen</button><p v-if="message" class="hint">{{ message }}</p></div></div>
-          <div class="card pixel-card menu-window"><h2>Ergebnisse eintragen</h2><div class="menu-body"><p v-if="matches.length===0" class="muted">Noch keine Spiele angelegt.</p><MatchCard v-for="m in matches" :key="m.id" :match="m" :number="matchNumber(m)" :editable="true" :name-of="nameOf" @delete="$emit('delete-match',$event)" @score="$emit('score',$event)" /></div></div>
+          <div class="card pixel-card menu-window"><h2>Ergebnisse eintragen</h2><div class="menu-body"><p v-if="matches.length===0" class="muted">Noch keine Spiele angelegt.</p><MatchCard v-for="m in sortedMatches" :key="m.id" :match="m" :number="matchNumber(m)" :editable="true" :name-of="nameOf" @delete="$emit('delete-match',$event)" @score="$emit('score',$event)" /></div></div>
         </template>
         <AdminRpgCatalogManager v-if="activePanel === 'catalog'" />
       </template>
@@ -41,6 +41,27 @@ const props = defineProps({ adminUnlocked:Boolean, userEmail:String, players:{ t
 const emit = defineEmits(['login','logout','refresh','approve-player','add-player','update-player','delete-player','create-match','delete-match','score','update-rules'])
 const activePanel = ref('menu'), newName = ref(''), newStrength = ref(6), mode = ref('4v4'), approvingId = ref(null)
 const pendingPlayers = computed(() => (props.players || []).filter(p => p.approved === false || p.approved === null || p.approved === undefined))
+const sortedMatches = computed(() => {
+  return [...(props.matches || [])].sort((a, b) => {
+    const aFinished =
+      a.score_a !== null &&
+      a.score_b !== null &&
+      a.score_a !== '' &&
+      a.score_b !== ''
+
+    const bFinished =
+      b.score_a !== null &&
+      b.score_b !== null &&
+      b.score_a !== '' &&
+      b.score_b !== ''
+
+    if (aFinished !== bFinished) {
+      return aFinished ? 1 : -1
+    }
+
+    return props.matchNumber(b) - props.matchNumber(a)
+  })
+})
 function add(){ const name = newName.value.trim(); if(!name) return; emit('add-player',{ name, strength:Number(newStrength.value) }); newName.value=''; newStrength.value=6 }
 
 function approve(playerId) {
