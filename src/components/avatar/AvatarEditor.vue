@@ -132,6 +132,7 @@ import StatControlRow from './StatControlRow.vue'
 import SunGamesRow from './SunGamesRow.vue'
 import { avatarOptions, getNextOption, getOptionLabel } from '../../services/avatarOptions'
 import { loadProfileChoices } from '../../services/playerProfileService'
+import { xpForLevel,levelFromXp } from '../../utils/levelSystem'
 
 const props = defineProps({
   profile: { type: Object, required: true },
@@ -206,18 +207,6 @@ function makeDraft(profile) {
 
 function resetStatsDraft() {
   return { teamgeist: 0, geschwindigkeit: 0, kraft: 0, technik: 0, ehrgeiz: 0 }
-}
-
-function xpForLevel(targetLevel) {
-  let needed = 0
-  for (let current = 1; current < targetLevel; current += 1) needed += current * 15 + 10
-  return needed
-}
-
-function levelFromXp(totalXp) {
-  let lvl = 1
-  while (totalXp >= xpForLevel(lvl + 1) && lvl < 99) lvl += 1
-  return lvl
 }
 
 async function loadChoices() {

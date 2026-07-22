@@ -17,17 +17,35 @@ async function loadScoreTotals() {
 }
 
 export async function loadAll() {
-  const [p, m, s, cards, totals] = await Promise.all([
-    supabase.from('players').select('*').order('created_at', { ascending: true }),
-    supabase.from('matches').select('*').order('created_at', { ascending: true }),
-    supabase.from('settings').select('*').eq('id', 'main').maybeSingle(),
-    loadPlayerCards(),
-    loadScoreTotals()
-  ])
+const [p, m, s, cards, totals, titles] = await Promise.all([
+  supabase.from('players').select('*').order('created_at', { ascending: true }),
+  supabase.from('matches').select('*').order('created_at', { ascending: true }),
+  supabase.from('settings').select('*').eq('id', 'main').maybeSingle(),
+  loadPlayerCards(),
+  loadScoreTotals(),
+
+  supabase
+    .from('player_titles')
+    .select(`
+      id,
+      name,
+      strength_modifier,
+      speed_modifier,
+      technique_modifier,
+      ambition_modifier,
+      team_modifier,
+      power_modifier,
+      effect_code,
+      effect_value,
+      effect_target,
+      effect_scope
+    `)
+])
 
   if (p.error) throw p.error
   if (m.error) throw m.error
   if (s.error) throw s.error
+  if (titles.error) throw titles.error
 
   const cardByPlayerId = Object.fromEntries(
     (cards || []).map(row => [row.player_id, row])
@@ -37,9 +55,25 @@ export async function loadAll() {
     (totals || []).map(row => [row.player_id, row])
   )
 
+  const titleById = Object.fromEntries(
+  (titles.data || []).map(title => [String(title.id), title])
+  )
+
+  const titleByName = Object.fromEntries(
+  (titles.data || []).map(title => [title.name, title])
+  )
+
+  const calculatedForm = calculateForm(
+  p.data || [],
+  m.data || []
+  )
+
   const players = (p.data || []).map(player => {
     const card = cardByPlayerId[player.id] || {}
     const score = totalsByPlayerId[player.id] || {}
+    const selectedTitle =
+      titleById[String(card.selected_title_id)] ||
+      titleByName[card.selected_title_name] || {}
 
     return {
       ...player,
@@ -51,8 +85,9 @@ export async function loadAll() {
       active: player.active,
       approved: player.approved,
       strength: player.strength,
-      form: player.form,
+      form: Number(calculatedForm[player.id] || 0),
 
+    
       score_total: Number(score.total_points || 0),
       score_games: Number(score.games || 0),
       score_wins: Number(score.wins || 0),
@@ -84,6 +119,42 @@ export async function loadAll() {
       selected_title_id: card.selected_title_id || null,
       selected_title_name: card.selected_title_name || null,
       selected_title_description: card.selected_title_description || null,
+      title_strength_modifier: Number(
+  selectedTitle.strength_modifier || 0
+),
+
+title_speed_modifier: Number(
+  selectedTitle.speed_modifier || 0
+),
+
+title_technique_modifier: Number(
+  selectedTitle.technique_modifier || 0
+),
+
+title_ambition_modifier: Number(
+  selectedTitle.ambition_modifier || 0
+),
+
+title_team_modifier: Number(
+  selectedTitle.team_modifier || 0
+),
+
+title_power_modifier: Number(
+  selectedTitle.power_modifier || 0
+),
+
+title_effect_code:
+  selectedTitle.effect_code || null,
+
+title_effect_value: Number(
+  selectedTitle.effect_value || 0
+),
+
+title_effect_target:
+  selectedTitle.effect_target || 'self',
+
+title_effect_scope:
+  selectedTitle.effect_scope || 'permanent',
 
       selected_special_attack_id: card.selected_special_attack_id || null,
       selected_special_attack_name: card.selected_special_attack_name || null,
