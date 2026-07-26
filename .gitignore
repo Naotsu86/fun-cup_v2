@@ -11,3 +11,6 @@ dist/
 # Betriebssystem
 .DS_Store
 Thumbs.db
+
+# Lokale Datenbank-Backups
+supabase/backups/

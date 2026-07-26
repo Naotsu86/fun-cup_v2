@@ -467,29 +467,26 @@ export function createTiebreakMatch(
     }
   }
 
-  return {
-    /*
-     * Vorläufig besondere Modusbezeichnung.
-     * Damit können wir das Spiel später von normalen
-     * 2-gegen-2-Spielen unterscheiden.
-     */
-    mode: 'tiebreak-2v2',
+return {
+  mode: 'tiebreak-2v2',
 
-    team_a: best.teamA.map(
-      player => player.id
-    ),
+  tiebreak_player_a_id: playerAId,
+  tiebreak_player_b_id: playerBId,
 
-    team_b: best.teamB.map(
-      player => player.id
-    ),
+  team_a: best.teamA.map(
+    player => player.id
+  ),
 
-    bench_players: [],
+  team_b: best.teamB.map(
+    player => player.id
+  ),
 
-    absent_players: [],
+  bench_players: [],
+  absent_players: [],
 
-    score_a: null,
-    score_b: null
-  }
+  score_a: null,
+  score_b: null
+ }
 }
 
 export function createRoundRobinTiebreakMatches(

@@ -69,7 +69,10 @@
       </div>
     </div>
 
-    <div v-if="benchPlayers.length" class="bench-box">
+    <div
+  v-if="benchPlayers.length && !isTiebreak"
+  class="bench-box"
+>
       <strong>PAUSE / FANBLOCK</strong>
       <span v-for="id in benchPlayers" :key="id">{{ nameOf(id) }}</span>
       <small>
@@ -96,6 +99,10 @@ const props = defineProps({
   editable: { type: Boolean, default: false },
   nameOf: { type: Function, required: true }
 })
+
+const isTiebreak = computed(
+  () => props.match?.mode === 'tiebreak-2v2'
+)
 
 const emit = defineEmits(['delete', 'score'])
 
