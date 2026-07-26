@@ -24,7 +24,9 @@
           {{ r.selected_title_name || 'Kein Titel' }}
         </div>
         <div class="ranking-name-main">{{ r.name }} <RankTrend :change="r.rank_change" /></div>
-        <div class="ranking-points-main">{{ r.points }} Punkte</div>
+        <div class="ranking-points-main">
+  {{ formatPoints(r.points) }} Punkte
+</div>
         <div class="ranking-meta">
            {{ r.games }} Spiele · {{ formatWinRate(r.win_rate) }} % Siege · Ø {{ formatAverage(r.average_points) }} Punkte
           
@@ -66,6 +68,14 @@ function formatWinRate(value) {
 function formatAverage(value) {
   const number = Number(value || 0)
   return Number.isInteger(number) ? String(number) : number.toFixed(1)
+}
+
+function formatPoints(value) {
+  const number = Number(value || 0)
+
+  return Number.isInteger(number)
+    ? String(number)
+    : number.toFixed(1).replace('.', ',')
 }
 </script>
 

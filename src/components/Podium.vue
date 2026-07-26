@@ -23,7 +23,9 @@
       >
         <div class="podium-title">{{ row.selected_title_name || 'Kein Titel' }}</div>
         <div class="podium-name">{{ row.name }} <RankTrend :change="row.rank_change" /> </div>
-        <div class="podium-points">{{ row.points }} Punkte</div>
+        <div class="podium-points">
+  {{ formatPoints(row.points) }} Punkte
+</div>
         <div class="podium-meta">
         {{ row.games }} Spiele · {{ formatWinRate(row.win_rate) }} % Siege · Ø {{ formatAverage(row.average_points) }} Punkte
           
@@ -53,7 +55,13 @@ function formatAverage(value) {
   const number = Number(value || 0)
   return Number.isInteger(number) ? String(number) : number.toFixed(1)
 }
+function formatPoints(value) {
+  const number = Number(value || 0)
 
+  return Number.isInteger(number)
+    ? String(number)
+    : number.toFixed(1).replace('.', ',')
+}
 function badge(index) {
   if (index === 0) return `${base}badges/first.png`
   if (index === 1) return `${base}badges/second.png`

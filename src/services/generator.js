@@ -361,6 +361,171 @@ export function createNextMatch(players, matches, mode) {
     score_b: null
   }
 }
+export function createTiebreakMatch(
+  players,
+  matches,
+  playerAId,
+  playerBId
+) {
+  if (!playerAId || !playerBId) {
+    throw new Error(
+      'Für das Entscheidungsspiel müssen zwei Spieler ausgewählt werden.'
+    )
+  }
+
+  if (playerAId === playerBId) {
+    throw new Error(
+      'Ein Spieler kann nicht gegen sich selbst antreten.'
+    )
+  }
+
+  const eligiblePlayers = players.filter(
+    player =>
+      player.approved !== false &&
+      player.active !== false
+  )
+
+  const playerA = eligiblePlayers.find(
+    player => player.id === playerAId
+  )
+
+  const playerB = eligiblePlayers.find(
+    player => player.id === playerBId
+  )
+
+  if (!playerA || !playerB) {
+    throw new Error(
+      'Mindestens einer der ausgewählten Spieler ist nicht aktiv oder nicht freigegeben.'
+    )
+  }
+
+  const possibleTeammates = eligiblePlayers.filter(
+    player =>
+      player.id !== playerAId &&
+      player.id !== playerBId
+  )
+
+  if (possibleTeammates.length < 2) {
+    throw new Error(
+      'Für ein Entscheidungsspiel werden mindestens vier aktive Spieler benötigt.'
+    )
+  }
+
+  const {
+  selected: selectedTeammates
+} = selectPlayers(
+  possibleTeammates,
+  matches,
+  2
+)
+
+  const matchHistory = history(matches)
+
+  const teammateOne = selectedTeammates[0]
+  const teammateTwo = selectedTeammates[1]
+
+  const variants = [
+    {
+      teamA: [playerA, teammateOne],
+      teamB: [playerB, teammateTwo]
+    },
+    {
+      teamA: [playerA, teammateTwo],
+      teamB: [playerB, teammateOne]
+    }
+  ]
+
+  let best = null
+
+  for (const variant of variants) {
+    const score =
+      Math.abs(
+        teamSum(variant.teamA) -
+        teamSum(variant.teamB)
+      ) * 100 +
+      (
+        teamPenalty(
+          variant.teamA,
+          matchHistory
+        ) +
+        teamPenalty(
+          variant.teamB,
+          matchHistory
+        )
+      ) * 30 +
+      opponentPenalty(
+        variant.teamA,
+        variant.teamB,
+        matchHistory
+      ) * 8
+
+    if (!best || score < best.score) {
+      best = {
+        ...variant,
+        score
+      }
+    }
+  }
+
+  return {
+    /*
+     * Vorläufig besondere Modusbezeichnung.
+     * Damit können wir das Spiel später von normalen
+     * 2-gegen-2-Spielen unterscheiden.
+     */
+    mode: 'tiebreak-2v2',
+
+    team_a: best.teamA.map(
+      player => player.id
+    ),
+
+    team_b: best.teamB.map(
+      player => player.id
+    ),
+
+    bench_players: [],
+
+    absent_players: [],
+
+    score_a: null,
+    score_b: null
+  }
+}
+
+export function createRoundRobinTiebreakMatches(
+  players,
+  matches,
+  playerIds
+) {
+  const uniquePlayerIds = [
+    ...new Set((playerIds || []).filter(Boolean))
+  ]
+
+  if (uniquePlayerIds.length < 3) {
+    throw new Error(
+      'Für eine Entscheidungsrunde werden mindestens drei Spieler benötigt.'
+    )
+  }
+
+  const roundMatches = []
+  const generatedMatches = [...matches]
+
+  for (let i = 0; i < uniquePlayerIds.length; i += 1) {
+    for (let j = i + 1; j < uniquePlayerIds.length; j += 1) {
+      const match = createTiebreakMatch(
+        players,
+        generatedMatches,
+        uniquePlayerIds[i],
+        uniquePlayerIds[j]
+      )
+
+      roundMatches.push(match)
+      generatedMatches.push(match)
+    }
+  }
+
+  return roundMatches
+}
 
 export function calculateForm(players, matches) {
   const form = Object.fromEntries(
@@ -368,6 +533,10 @@ export function calculateForm(players, matches) {
   )
 
   for (const match of matches) {
+    if (match.mode === 'tiebreak-2v2') {
+      continue
+    }
+
     if (
       match.score_a === null ||
       match.score_b === null ||
