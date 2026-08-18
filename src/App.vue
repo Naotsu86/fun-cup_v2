@@ -371,21 +371,61 @@ async function handleDeleteMatch(id) {
 }
 
 async function handleScore(payload) {
-  await run(async () => {
-    if ('score_a' in payload || 'score_b' in payload) {
-      await updateMatch(payload.id, {
-        score_a: payload.score_a,
-        score_b: payload.score_b
-      })
-    } else {
-      await updateMatch(payload.id, {
-        [payload.side]: payload.value
-      })
+  const currentMatch = matches.value.find(
+    match => match.id === payload.id
+  )
+
+  if (!currentMatch) {
+    error.value = 'Das Spiel wurde nicht gefunden.'
+    return
+  }
+
+  const alreadyFinished =
+    currentMatch.score_a !== null &&
+    currentMatch.score_b !== null &&
+    currentMatch.score_a !== '' &&
+    currentMatch.score_b !== ''
+
+  const newScoreA = Number(payload.score_a)
+  const newScoreB = Number(payload.score_b)
+
+  if (
+    alreadyFinished &&
+    (
+      Number(currentMatch.score_a) !== newScoreA ||
+      Number(currentMatch.score_b) !== newScoreB
+    )
+  ) {
+    const confirmed = window.confirm(
+      `Gespeichertes Ergebnis ändern?\n\n` +
+      `Bisher: ${currentMatch.score_a}:${currentMatch.score_b}\n` +
+      `Neu: ${newScoreA}:${newScoreB}\n\n` +
+      `Die Punkte und die Rangliste werden entsprechend neu berechnet.`
+    )
+
+    if (!confirmed) {
+      return
     }
+  }
+
+  await run(async () => {
+    await updateMatch(payload.id, {
+      score_a: newScoreA,
+      score_b: newScoreB
+    })
 
     await loadData()
-    await updateForms(players.value, matches.value)
+
+    await updateForms(
+      players.value,
+      matches.value
+    )
+
     await loadData()
+
+    message.value = alreadyFinished
+      ? 'Ergebnis wurde korrigiert.'
+      : 'Ergebnis wurde gespeichert.'
   })
 }
 
