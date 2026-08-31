@@ -176,10 +176,9 @@ title_effect_scope:
   }
 }
 
+
 export async function addPlayer(row) {
-  // Alle bereits abgeschlossenen normalen Spiele laden.
-  // Entscheidungsspiele zählen nicht, da sie keine normalen
-  // Turnierpunkte vergeben.
+  // Alle bereits abgeschlossenen Spiele laden
   const { data: finishedMatches, error: matchError } = await supabase
     .from('matches')
     .select('score_a, score_b, mode')
@@ -188,8 +187,9 @@ export async function addPlayer(row) {
 
   if (matchError) throw matchError
 
-  // Ein neuer Spieler bekommt rückwirkend für jedes bisherige
-  // normale Spiel die Punktzahl des Verliererteams.
+  // Für jedes bisherige normale Spiel bekommt ein neuer Spieler
+  // rückwirkend die Punktzahl des Verliererteams.
+  // Entscheidungsspiele zählen nicht.
   const startPoints = (finishedMatches || [])
     .filter(match => match.mode !== 'tiebreak-2v2')
     .reduce((sum, match) => {
@@ -206,7 +206,6 @@ export async function addPlayer(row) {
       return sum + Math.min(scoreA, scoreB)
     }, 0)
 
-
   // Spieler anlegen
   const { data: newPlayer, error: insertError } = await supabase
     .from('players')
@@ -221,7 +220,7 @@ export async function addPlayer(row) {
 
   if (insertError) throw insertError
 
-  // Rückwirkende Startpunkte eintragen
+  // Startpunkte hinterlegen
   if (startPoints > 0) {
     const { error: adjustmentError } = await supabase
       .from('player_point_adjustments')
@@ -235,6 +234,7 @@ export async function addPlayer(row) {
     if (adjustmentError) throw adjustmentError
   }
 }
+
 export async function updatePlayer(id, patch) {
   const { error } = await supabase.from('players').update(patch).eq('id', id)
   if (error) throw error

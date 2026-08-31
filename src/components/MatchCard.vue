@@ -221,17 +221,14 @@ watch(
     const incomingA = toDraft(scoreA)
     const incomingB = toDraft(scoreB)
 
-    if (
-      !editing.value ||
-      !hasUnsavedChanges.value ||
-      (
-        draftA.value === incomingA &&
-        draftB.value === incomingB
-      )
-    ) {
-      draftA.value = incomingA
-      draftB.value = incomingB
+    // Wenn der Admin gerade lokal ein Ergebnis eingibt,
+    // darf der automatische 5-Sekunden-Refresh es nicht überschreiben.
+    if (hasUnsavedChanges.value) {
+      return
     }
+
+    draftA.value = incomingA
+    draftB.value = incomingB
   }
 )
 
