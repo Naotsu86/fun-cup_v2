@@ -177,13 +177,63 @@ title_effect_scope:
 }
 
 export async function addPlayer(row) {
-  const { error } = await supabase.from('players').insert({
-    name: row.name,
-    strength: row.strength,
-    form: 0,
-    active: true
-  })
-  if (error) throw error
+  // 1. Aktuell aktive und freigegebene Spieler bestimmen
+  const { data: activePlayers, error: playerError } = await supabase
+    .from('players')
+    .select('id')
+    .eq('active', true)
+    .eq('approved', true)
+
+  if (playerError) throw playerError
+
+  // 2. Aktuelle Ranglistenpunkte laden
+  const { data: totals, error: totalsError } = await supabase
+    .rpc('get_player_score_totals')
+
+  if (totalsError) throw totalsError
+
+  const activeIds = new Set(
+    (activePlayers || []).map(player => player.id)
+  )
+
+  const activeTotals = (totals || [])
+    .filter(row => activeIds.has(row.player_id))
+    .map(row => Number(row.total_points || 0))
+    .filter(points => Number.isFinite(points))
+
+  // Niedrigster Punktestand VOR Anlage des neuen Spielers
+  const startPoints =
+    activeTotals.length > 0
+      ? Math.min(...activeTotals)
+      : 0
+
+  // 3. Spieler anlegen und neue ID zurückgeben lassen
+  const { data: newPlayer, error: insertError } = await supabase
+    .from('players')
+    .insert({
+      name: row.name,
+      strength: row.strength,
+      form: 0,
+      active: true
+    })
+    .select('id')
+    .single()
+
+  if (insertError) throw insertError
+
+  // 4. Startpunkte als Korrektur hinterlegen
+  if (startPoints > 0) {
+    const { error: adjustmentError } = await supabase
+      .from('player_point_adjustments')
+      .insert({
+        player_id: newPlayer.id,
+        points: startPoints,
+        reason:
+          'Startpunkte bei manueller Anlage: niedrigster aktueller Punktestand'
+      })
+
+    if (adjustmentError) throw adjustmentError
+  }
 }
 
 export async function updatePlayer(id, patch) {
