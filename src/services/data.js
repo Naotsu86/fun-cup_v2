@@ -177,37 +177,37 @@ title_effect_scope:
 }
 
 export async function addPlayer(row) {
-  // 1. Aktuell aktive und freigegebene Spieler bestimmen
-  const { data: activePlayers, error: playerError } = await supabase
-    .from('players')
-    .select('id')
-    .eq('active', true)
-    .eq('approved', true)
+  // Alle bereits abgeschlossenen normalen Spiele laden.
+  // Entscheidungsspiele zählen nicht, da sie keine normalen
+  // Turnierpunkte vergeben.
+  const { data: finishedMatches, error: matchError } = await supabase
+    .from('matches')
+    .select('score_a, score_b, mode')
+    .not('score_a', 'is', null)
+    .not('score_b', 'is', null)
 
-  if (playerError) throw playerError
+  if (matchError) throw matchError
 
-  // 2. Aktuelle Ranglistenpunkte laden
-  const { data: totals, error: totalsError } = await supabase
-    .rpc('get_player_score_totals')
+  // Ein neuer Spieler bekommt rückwirkend für jedes bisherige
+  // normale Spiel die Punktzahl des Verliererteams.
+  const startPoints = (finishedMatches || [])
+    .filter(match => match.mode !== 'tiebreak-2v2')
+    .reduce((sum, match) => {
+      const scoreA = Number(match.score_a)
+      const scoreB = Number(match.score_b)
 
-  if (totalsError) throw totalsError
+      if (
+        !Number.isFinite(scoreA) ||
+        !Number.isFinite(scoreB)
+      ) {
+        return sum
+      }
 
-  const activeIds = new Set(
-    (activePlayers || []).map(player => player.id)
-  )
+      return sum + Math.min(scoreA, scoreB)
+    }, 0)
 
-  const activeTotals = (totals || [])
-    .filter(row => activeIds.has(row.player_id))
-    .map(row => Number(row.total_points || 0))
-    .filter(points => Number.isFinite(points))
 
-  // Niedrigster Punktestand VOR Anlage des neuen Spielers
-  const startPoints =
-    activeTotals.length > 0
-      ? Math.min(...activeTotals)
-      : 0
-
-  // 3. Spieler anlegen und neue ID zurückgeben lassen
+  // Spieler anlegen
   const { data: newPlayer, error: insertError } = await supabase
     .from('players')
     .insert({
@@ -221,7 +221,7 @@ export async function addPlayer(row) {
 
   if (insertError) throw insertError
 
-  // 4. Startpunkte als Korrektur hinterlegen
+  // Rückwirkende Startpunkte eintragen
   if (startPoints > 0) {
     const { error: adjustmentError } = await supabase
       .from('player_point_adjustments')
@@ -229,13 +229,12 @@ export async function addPlayer(row) {
         player_id: newPlayer.id,
         points: startPoints,
         reason:
-          'Startpunkte bei manueller Anlage: niedrigster aktueller Punktestand'
+          'Startpunkte bei manueller Anlage: Verliererpunkte aller bisherigen Spiele'
       })
 
     if (adjustmentError) throw adjustmentError
   }
 }
-
 export async function updatePlayer(id, patch) {
   const { error } = await supabase.from('players').update(patch).eq('id', id)
   if (error) throw error
